@@ -1,0 +1,41 @@
+# Ativar o mecanismo de reescrita de URLs
+RewriteEngine On
+
+# Forçar HTTPS
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Remover a extensão .html dos URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Configurar cache para melhorar o desempenho
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 1 day"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# Configurar o arquivo de índice padrão
+DirectoryIndex index.html
+
+# Proteger arquivos sensíveis
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|bak|sql)$">
+    Require all denied
+</FilesMatch>
+
+# Prevenir listagem de diretórios
+Options -Indexes
+
+# Configurar uma página de erro personalizada
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
