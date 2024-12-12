@@ -228,6 +228,10 @@ header
   color: #edb83b!important;
 }
 
+.background-header .nav li:last-child a.active[href="#contact-us"] {
+  color: #fff !important;
+}
+
 .background-header .nav li a.active {
   color: #edb83b!important;
 }
@@ -324,7 +328,6 @@ header
 }
 
 .header-area .main-nav .nav li:last-child a:hover {
-  background-color: #f9b45b;
   opacity: 1;
 }
 
@@ -645,7 +648,7 @@ banner
 .main-banner .caption h2 {
   margin-top: 30px;
   margin-bottom: 25px;
-  font-size: 84px;
+  font-size: 64px;
   text-transform: uppercase;
   font-weight: 800;
   color: #fff;
@@ -670,8 +673,10 @@ features
 }
 
 .feature-item {
-  display: inline-block;
-  margin-bottom: 60px;
+  
+  display: flex;
+  align-items: flex-start;
+  height: 200px;
 }
 
 .feature-item .left-icon img {
@@ -681,6 +686,7 @@ features
 
 .feature-item .right-content {
   display: inline;
+  flex: 1;
 }
 
 .feature-item .right-content h4 {
@@ -756,7 +762,9 @@ Our Classes
   margin-bottom: 30px;
   display: inline-block;
   width: 100%;
+  position: relative;
 }
+
 #tabs ul li:last-child {
   margin-bottom: 0px;
 }
@@ -774,6 +782,11 @@ Our Classes
   font-weight: 600;
   transition: all 0.3s;
 }
+
+#tabs ul li a > i {
+  margin-right: 10px;
+}
+
 #tabs .main-rounded-button a {
   text-align: center;
   padding: 20px 30px;
@@ -806,26 +819,78 @@ Our Classes
 #tabs ul .ui-tabs-active span {
   color: #1e1e1e;
 }
-.tabs-content {
+
+
+
+#tabs ul li > article {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 650px;
+  margin-left: 20px;
+  background: #fff;
+  z-index: 10;
+  padding: 0 20px;
+}
+
+/* media tablet and mobile */
+@media (max-width: 991.98px) {
+  #tabs ul li > article {
+    width: 100%;
+    position: relative;
+    margin-left: 0 !important;
+    margin-top: 20px;
+    left: auto;
+    top: auto;
+  }
+
+  #tabs ul li > article h4 {
+    display: none;
+  }
+}
+#tabs ul li:last-child > article {
+  bottom: 0;
+  top: auto;
+}
+
+/* Estilos para os artigos */
+
+#tabs ul li > article img {
+max-width: 100%;
+height: auto;
+}
+
+#tabs ul li > article h4 {
+color: #f9b300;
+font-size: 1.6rem;
+margin-top: 20px;
+}
+
+#tabs ul li > article p {
+font-size: 1rem;
+line-height: 1.6;
+}
+
+#tabs ul li > article {
   margin-left: 30px;
   text-align: left;
   display: inline-block;
   transition: all 0.3s;
 }
-.tabs-content img {
+#tabs ul li > article img {
   max-width: 100%;
   overflow: hidden;
   border-radius: 5px;
 }
-.tabs-content h4 {
+#tabs ul li > article h4 {
   font-size: 23px;
   font-weight: 700;
   color: #232d39;
   letter-spacing: 0.5px;
   margin-bottom: 20px;
-  margin-top: 30px;
+  margin-top: 0;
 }
-.tabs-content p {
+#tabs ul li > article p {
   font-size: 14px;
   color: #7a7a7a;
   margin-bottom: 28px;
@@ -1249,14 +1314,15 @@ responsive
 }
 
 /* Estilo para o ícone dentro do retângulo amarelo */
+
 .left-icon {
-  width: 150px; /* Largura do retângulo */
-  height: 100px; /* Altura do retângulo */
-  background-color: #FFCC00; /* Cor de fundo amarela */
+  width: 80px;
+  height: 80px;
+  background-color: #f3ae2d;
   display: flex;
-  justify-content: center; /* Alinha o conteúdo horizontalmente no centro */
-  align-items: center; /* Alinha o conteúdo verticalmente no centro */
-  border-radius: 5px; /* Bordas arredondadas (opcional) */
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
 }
 
 .left-icon i {
@@ -1264,11 +1330,6 @@ responsive
   color: white; /* Cor do ícone */
 }
 
-/* Estilo para cada item de funcionalidade (feature-item) */
-.feature-item {
-  display: flex; /* Usar Flexbox para alinhar o conteúdo horizontalmente */
-  align-items: center; /* Alinha os itens verticalmente ao centro */
-}
 
 /* Alinhamento entre o ícone e o texto */
 .feature-item .left-icon {
@@ -1293,7 +1354,7 @@ responsive
 /* Estilo para o botão de "descubra mais" */
 .feature-item .text-button {
   margin-top: 10px; /* Espaço entre a descrição e o botão */
-  color: #ffcc00; /* Cor do botão */
+  color: #f3ae2d; /* Cor do botão */
   text-decoration: none; /* Remove sublinhado */
   font-weight: bold;
 }
@@ -1321,7 +1382,7 @@ responsive
 
 /* Efeito hover para cada item da agenda */
 .schedule-list li:hover {
-  background-color: #FFCC00; /* Muda o fundo para amarelo ao passar o mouse */
+  background-color: #f3ae2d; /* Muda o fundo para amarelo ao passar o mouse */
   color: white; /* Muda a cor do texto para branco */
 }
 
@@ -1403,5 +1464,240 @@ responsive
 }
 
 .social-icon:hover {
-  color: #4CAF50;
+  color: #f9b300;
+}
+.social-media-links {
+  margin-top: -30px;
+  position: absolute;
+  width: 100%;
+  z-index: 90;
+  text-align: center;
+}
+
+.social-media-links .social-icon {
+  font-size: 30px;
+  background-color: #fff;
+  transition: color 0.3s;
+  display: inline-block;
+  border-radius: 50%;
+  width: 50px;
+  line-height: 50px;
+  margin: 0 5px;
+  text-align: center;
+}
+
+
+.social-media-links .social-icon i {
+  margin-right: 0;
+}
+
+
+/**
+ * ---------------------------------------------
+ * Responsive
+ * ---------------------------------------------
+*/
+/* CSS Clean para Bootstrap 4 */
+
+/* Modal */
+.modal-content {
+  border-radius: 6px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+}
+
+.modal-header {
+  border-bottom: 1px solid #ddd;
+  padding: 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+.modal-title {
+  margin: 0;
+}
+
+.modal-body {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.modal-footer {
+  border-top: 1px solid #ddd;
+  padding: 15px;
+  text-align: right;
+  background-color: #f9f9f9;
+}
+
+/* Botões */
+.modal-footer .btn {
+  background-color: #f9b300;
+  color: #fff;
+  font-size: 0.85rem;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.modal-footer .btn:hover {
+  background-color: #d99600;
+}
+
+/* Accordion */
+.card {
+  border: none;
+  background-color: transparent;
+  margin-bottom: 10px;
+}
+
+.card-header {
+  padding: 10px 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card-header button {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+  background: none;
+  border: none;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.card-header button:hover {
+  color: #f9b300;
+}
+
+.card-body {
+  padding: 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Listas */
+.card-body ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.card-body ul li {
+  margin-bottom: 8px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .modal-content {
+      padding: 15px;
+  }
+  .modal-header,
+  .modal-footer {
+      padding: 10px;
+  }
+  .modal-body {
+      font-size: 0.85rem;
+  }
+}
+
+/* Estilo para o menu de navegação */
+ul.list-unstyled li {
+    margin-bottom: 10px;
+}
+
+ul.list-unstyled a {
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+ul.list-unstyled i {
+    color: #f9b300;
+    margin-right: 8px;
+    font-size: 1rem;
+}
+
+ul.list-unstyled a:hover {
+    text-decoration: underline;
+    color: #f9b300;
+}
+
+/* Adicionando rolagem suave */
+html {
+    scroll-behavior: smooth;
+}
+
+
+.main-button a {
+    background-color: #f9b300;
+    color: #fff;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.main-button a:hover {
+    background-color: #e69d00;
+}
+
+
+ul.list-unstyled li {
+  margin-bottom: 10px;
+}
+
+ul.list-unstyled a {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+ul.list-unstyled i {
+  color: #f9b300;
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+ul.list-unstyled a:hover {
+  text-decoration: underline;
+  color: #f9b300;
+}
+
+/* Estilização personalizada para btn-primary */
+.btn-primary {
+  background-color: #edb83b !important; /* Define a cor de fundo */
+  border-color: #edb83b !important; /* Define a cor da borda */
+}
+
+/* Alteração da cor de fundo ao passar o mouse */
+.btn-primary:hover {
+  background-color: #d9a534 !important; /* Cor levemente mais escura para o hover */
+  border-color: #d9a534 !important; /* Combina com a borda do hover */
+}
+
+/* Alteração da cor de fundo ao clicar */
+.btn-primary:active, .btn-primary.active {
+  background-color: #c3942f !important; /* Cor mais escura para clique */
+  border-color: #c3942f !important;
+}
+
+/* Alteração para o foco */
+.btn-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(237, 184, 59, 0.5) !important;
 }
