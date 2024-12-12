@@ -145,6 +145,10 @@ body {
   }
 }
 
+.section {
+margin-bottom: 20px;
+}
+
 .section-heading {
   text-align: center;
   margin-top: 140px;
@@ -266,6 +270,20 @@ header
   -moz-transition: all 0.3s ease 0s;
   -o-transition: all 0.3s ease 0s;
   transition: all 0.3s ease 0s;
+}
+
+.header-area .main-nav .logo img {
+  height: 50px;
+}
+
+@media (max-width: 375px) {
+  .header-area .main-nav .logo img {
+    height: 30px!important;
+  }
+}
+
+.header-area .main-nav .logo img {
+  height: 50px;
 }
 
 .header-area .main-nav .logo em {
@@ -476,7 +494,7 @@ header
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 769px) {
   .header-area .main-nav .logo {
     color: #1e1e1e;
   }
@@ -588,7 +606,7 @@ header
   }
 }
 
-@media (min-width: 767px) {
+@media (min-width: 1024px) {
   .header-area .main-nav .nav {
     display: flex !important;
   }
@@ -869,6 +887,7 @@ margin-top: 20px;
 #tabs ul li > article p {
 font-size: 1rem;
 line-height: 1.6;
+text-align: justify;
 }
 
 #tabs ul li > article {
@@ -1280,7 +1299,18 @@ responsive
 @media (max-width: 992px) {
 
   .main-banner .caption h2 {
-    font-size: 64px;
+    font-size: 55px!important;
+  }
+  .feature-item p {
+    font-size: 13px!important;
+  }
+  .left-icon {
+    width: 60px!important;
+    height: 60px!important;
+  }
+  
+  #call-to-action {
+    padding: 80px 0px;
   }
   #features {
     margin-bottom: 110px;
@@ -1308,8 +1338,19 @@ responsive
 }
 
 @media (max-width: 450px) {
+  .feature-item p {
+    font-size: 12px!important;
+    line-height: 22px!important;
+    text-align: left!important;
+  }
+  .main-banner .caption h2 {
+    font-size: 40px!important;
+  }
   .feature-item .right-content a.text-button {
     margin-left: 130px;
+  }
+  #pastors .trainer-item {
+    padding: 20px;
   }
 }
 
@@ -1349,6 +1390,7 @@ responsive
   font-size: 14px;
   color: #666666; /* Cor mais suave para o texto */
   margin: 0; /* Remove margens extras */
+  text-align: justify;
 }
 
 /* Estilo para o botão de "descubra mais" */
@@ -1372,7 +1414,7 @@ responsive
   border-radius: 5px; /* Borda arredondada */
   padding: 10px 20px; /* Espaçamento interno */
   margin-bottom: 15px; /* Espaço entre os itens */
-  font-size: 16px; /* Tamanho da fonte */
+  font-size: 13px; /* Tamanho da fonte */
   color: #333; /* Cor do texto */
   display: flex;
   justify-content: space-between; /* Alinha os textos à esquerda e direita */
@@ -1604,9 +1646,6 @@ responsive
 
 /* Responsividade */
 @media (max-width: 768px) {
-  .modal-content {
-      padding: 15px;
-  }
   .modal-header,
   .modal-footer {
       padding: 10px;
