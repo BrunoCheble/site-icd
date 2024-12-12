@@ -1558,6 +1558,11 @@
     <script src="assets/js/custom.js"></script>
 
     <script>
+    // Adiciona um estado base ao carregar a página (se necessário)
+    if (!history.state) {
+        history.replaceState({ modalOpen: false }, null, null);
+    }
+
     // Quando qualquer modal é aberto
     $(document).on('show.bs.modal', '.modal', function () {
         // Adiciona um estado ao histórico para indicar que um modal está aberto
@@ -1580,6 +1585,7 @@
         }
     };
 </script>
+
 
 </body>
 
