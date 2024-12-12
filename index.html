@@ -1558,35 +1558,12 @@
     <script src="assets/js/custom.js"></script>
 
     <script>
-    // Adiciona um estado base ao carregar a página (se necessário)
-    if (!history.state) {
-        history.replaceState({ modalOpen: false }, null, null);
-    }
-
-    // Quando qualquer modal é aberto
-    $(document).on('show.bs.modal', '.modal', function () {
-        // Adiciona um estado ao histórico para indicar que um modal está aberto
-        history.pushState({ modalOpen: true }, null, null);
-    });
-
-    // Quando qualquer modal é fechado
-    $(document).on('hide.bs.modal', '.modal', function () {
-        // Se o estado atual indica que um modal está aberto
-        if (history.state && history.state.modalOpen) {
-            history.back(); // Remove o estado do modal no histórico
-        }
-    });
-
-    // Detecta o botão "voltar" no navegador
-    window.onpopstate = function (event) {
-        if (event.state && event.state.modalOpen) {
-            // Fecha qualquer modal aberto
-            $('.modal').modal('hide');
-        }
-    };
-</script>
-
-
+        window.onpopstate = function (event) {
+            if($('.modal').is(':visible')) {
+                $('.modal').modal('hide');
+            }
+        };
+    </script>
 </body>
 
 </html>
