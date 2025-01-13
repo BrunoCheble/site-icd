@@ -61,6 +61,9 @@
 	    //smoothscroll
 	    $('.scroll-to-section a[href^="#"]').on('click', function (e) {
 	        e.preventDefault();
+
+					$('menu-trigger').click();
+
 	        $(document).off("scroll");
 	        
 	        $('a').each(function () {
