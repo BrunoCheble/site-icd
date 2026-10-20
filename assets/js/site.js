@@ -103,8 +103,8 @@
     if (ads) {
         const KEY = 'icd-announcements-v3';
         const FRESH = 60 * 1000;
-        const list = ads.querySelector('.ads');
-        const filters = ads.querySelector('.ads-filters');
+        const list = ads.querySelector('.board');
+        const filters = ads.querySelector('.board-filters');
         const icons = { resume: 'fa-file-alt', service: 'fa-tools', donation: 'fa-hand-holding-heart', product: 'fa-tag' };
         const names = { resume: 'Currículo', service: 'Serviço', donation: 'Doação', product: 'Produto' };
         const escape = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -115,15 +115,15 @@
         const card = (ad) => {
             // Every announcement has a picture in the same format (the system gives the default one when none was sent).
             const media = ad.image_url
-                ? `<div class="ad-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`
-                : `<div class="ad-media"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
+                ? `<div class="post-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="post-type">${escape(names[ad.type] || ad.type_name)}</span></div>`
+                : `<div class="post-media"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="post-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
             const actions = [
                 ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
                 ad.link ? `<a class="is-link" href="${escape(safeUrl(ad.link))}" target="_blank" rel="noopener nofollow"><i class="fas fa-external-link-alt"></i> Link</a>` : '',
                 ad.pdf_url ? `<a class="is-link" href="${escape(ad.pdf_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PDF</a>` : '',
             ].join('');
-            return `<article class="ad">${media}<div class="ad-body"><h3>${escape(ad.title)}</h3><p class="ad-text">${escape(ad.description)}</p>
-                <button type="button" class="ad-more" hidden>Ver mais</button><div class="ad-actions">${actions}</div></div></article>`;
+            return `<article class="post">${media}<div class="post-body"><h3>${escape(ad.title)}</h3><p class="post-text">${escape(ad.description)}</p>
+                <button type="button" class="post-more" hidden>Ver mais</button><div class="post-actions">${actions}</div></div></article>`;
         };
         // The row goes round by itself: the cards are repeated enough times to fill it, and once a whole set has
         // passed it jumps back by that set (they look the same, so it never ends). It stops while the mouse is over
@@ -162,7 +162,7 @@
             setWidth = 0;
             list.classList.add('is-static');
             list.querySelectorAll('[data-copy]').forEach((copy) => copy.remove());
-            const cards = [...list.querySelectorAll('.ad')];
+            const cards = [...list.querySelectorAll('.post')];
             if (cards.length < 2) return;
             const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
             const width = cards.reduce((sum, ad) => sum + ad.offsetWidth + gap, 0);
@@ -179,15 +179,15 @@
                     list.appendChild(copy);
                 });
             }
-            list.querySelectorAll('.ad').forEach(more);
+            list.querySelectorAll('.post').forEach(more);
             setWidth = width;
             pos = list.scrollLeft = 0;
             run();
         };
         // "Ver mais" only where the text is cut.
         const more = (ad) => {
-            const text = ad.querySelector('.ad-text');
-            const button = ad.querySelector('.ad-more');
+            const text = ad.querySelector('.post-text');
+            const button = ad.querySelector('.post-more');
             if (button.dataset.ready) return;
             button.dataset.ready = '1';
             if (text.scrollHeight > text.clientHeight + 2) button.hidden = false;
@@ -208,8 +208,8 @@
         const render = (type) => {
             shownCards = type ? all.filter((ad) => ad.type === type) : all;
             list.innerHTML = shownCards.length ? shownCards.map(card).join('')
-                : `<div class="ads-empty"><i class="fas fa-bullhorn"></i>Ainda não há anúncios. Seja o primeiro a anunciar!</div>`;
-            list.querySelectorAll('.ad').forEach(more);
+                : `<div class="board-empty"><i class="fas fa-bullhorn"></i>Ainda não há anúncios. Seja o primeiro a anunciar!</div>`;
+            list.querySelectorAll('.post').forEach(more);
             loop();
             filters.querySelectorAll('button').forEach((button) => button.classList.toggle('is-active', (button.dataset.type || '') === (type || '')));
         };
@@ -236,7 +236,7 @@
                     if (!saved || JSON.stringify(saved.data) !== JSON.stringify(data)) show(data);
                 })
                 .catch(() => {
-                    if (!saved) list.innerHTML = '<div class="ads-empty"><i class="fas fa-wifi"></i>Não foi possível carregar os anúncios agora.</div>';
+                    if (!saved) list.innerHTML = '<div class="board-empty"><i class="fas fa-wifi"></i>Não foi possível carregar os anúncios agora.</div>';
                 });
             return loading;
         };
