@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610202219">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610202326">
 </head>
 
 <body>
@@ -237,20 +237,38 @@
             <div class="heading reveal">
                 <img src="assets/images/logo-min.png" alt="Anúncios">
                 <h2>Anúncios da <em>Comunidade</em></h2>
-                <p>Serviços, produtos, doações e currículos dos membros da igreja.</p>
+                <p>Serviços, aulas, currículos e ofertas de emprego dos membros da igreja.</p>
             </div>
-            <div class="board-filters" role="tablist" aria-label="Tipo de anúncio" hidden></div>
+            <div class="board-filters" role="tablist" aria-label="Categoria de anúncio" hidden></div>
             <div class="board" aria-live="polite">
                 <div class="board-loading"><i class="fas fa-spinner fa-spin"></i> A carregar anúncios…</div>
             </div>
             <div class="board-cta reveal">
                 <div>
                     <h3>Tem algo para partilhar com a comunidade?</h3>
-                    <p>Os membros podem anunciar um serviço, um produto, uma doação ou o seu currículo. O anúncio aparece aqui depois de aprovado pela equipa.</p>
+                    <p>Os membros podem anunciar os seus serviços, aulas, o seu currículo ou uma oferta de emprego. O anúncio aparece aqui depois de aprovado pela equipa.</p>
                 </div>
                 <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener"><i class="fas fa-bullhorn"></i> Anunciar</a>
             </div>
         </div>
+        <!-- A member's comment about an announcement (the NIF says it is a member); shown once approved by the team -->
+        <dialog class="cmt" id="comment-dialog" aria-labelledby="comment-title">
+            <form class="cmt-box" novalidate>
+                <div class="cmt-head">
+                    <div><h3 id="comment-title">Enviar comentário</h3><p class="cmt-about"></p></div>
+                    <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+                </div>
+                <label class="cmt-field">NIF do membro<input name="member_document" inputmode="numeric" maxlength="9" autocomplete="off" required></label>
+                <label class="cmt-field">Comentário<textarea name="body" rows="4" maxlength="600" required placeholder="Ex. Fez um ótimo trabalho na minha casa, recomendo!"></textarea></label>
+                <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+                <p class="cmt-note"><i class="fas fa-info-circle"></i> Só os membros da igreja podem comentar. O comentário aparece aqui depois de aprovado pela equipa.</p>
+                <p class="cmt-msg" role="status"></p>
+                <div class="cmt-actions">
+                    <button type="button" class="btn btn-ghost" data-cmt-close>Fechar</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
+                </div>
+            </form>
+        </dialog>
     </section>
 
     <!-- Schedule -->
@@ -495,7 +513,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610202219"></script>
+    <script src="assets/js/site.js?v=202610202326"></script>
 </body>
 
 </html>

@@ -105,25 +105,29 @@
         const FRESH = 60 * 1000;
         const list = ads.querySelector('.board');
         const filters = ads.querySelector('.board-filters');
-        const icons = { resume: 'fa-file-alt', service: 'fa-tools', donation: 'fa-hand-holding-heart', product: 'fa-tag' };
-        const names = { resume: 'Currículo', service: 'Serviço', donation: 'Doação', product: 'Produto' };
         const escape = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const safeUrl = (url) => (/^https?:\/\//i.test(url || '') ? url : (url ? 'https://' + url : ''));
         let loading = null;
         let all = [];
 
         const card = (ad) => {
-            // Every announcement has a picture in the same format (the system gives the default one when none was sent).
-            const media = ad.image_url
-                ? `<div class="post-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="post-type">${escape(names[ad.type] || ad.type_name)}</span></div>`
-                : `<div class="post-media"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="post-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
+            // The category's picture (the same for all of its announcements), its fields as tags, the ways to reach
+            // whoever announced, and the members' approved comments.
+            const media = `<div class="post-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="post-type">${escape(ad.type_name)}</span></div>`;
+            const tags = (ad.details || []).map((line) => `<span title="${escape(line.label)}">${escape(line.short || line.value)}</span>`).join('');
             const actions = [
                 ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
                 ad.link ? `<a class="is-link" href="${escape(safeUrl(ad.link))}" target="_blank" rel="noopener nofollow"><i class="fas fa-external-link-alt"></i> Link</a>` : '',
-                ad.pdf_url ? `<a class="is-link" href="${escape(ad.pdf_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PDF</a>` : '',
+                ad.pdf_url ? `<a class="is-link" href="${escape(ad.pdf_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> Currículo</a>` : '',
             ].join('');
+            const comments = ad.comments || [];
+            const talk = (comments.length
+                ? `<button type="button" class="post-talk-toggle" data-talk><i class="far fa-comment"></i> ${comments.length} ${comments.length === 1 ? 'comentário' : 'comentários'}</button>
+                   <div class="post-talk-list" hidden>${comments.map((comment) => `<blockquote><p>${escape(comment.body)}</p><cite>${escape(comment.name)} · ${escape(comment.date)}</cite></blockquote>`).join('')}</div>`
+                : '') + (ad.comments_url ? `<button type="button" class="post-comment" data-comment="${escape(ad.id)}"><i class="far fa-comment-dots"></i> Enviar comentário</button>` : '');
             return `<article class="post">${media}<div class="post-body"><h3>${escape(ad.title)}</h3><p class="post-text">${escape(ad.description)}</p>
-                <button type="button" class="post-more" hidden>Ver mais</button><div class="post-actions">${actions}</div></div></article>`;
+                <button type="button" class="post-more" hidden>Ver mais</button>${tags ? `<div class="post-tags">${tags}</div>` : ''}
+                <div class="post-actions">${actions}</div><div class="post-talk">${talk}</div></div></article>`;
         };
         // The row goes round by itself: the cards are repeated enough times to fill it, and once a whole set has
         // passed it jumps back by that set (they look the same, so it never ends). It stops while the mouse is over
@@ -219,7 +223,8 @@
             all = [...data].sort((a, b) => ending(a).localeCompare(ending(b)));
             const types = [...new Set(all.map((ad) => ad.type))];
             filters.hidden = types.length < 2;
-            filters.innerHTML = ['', ...types].map((type) => `<button type="button" data-type="${type}">${type ? escape(names[type] || type) : 'Todos'}</button>`).join('');
+            const name = (type) => all.find((ad) => ad.type === type)?.type_name || type;
+            filters.innerHTML = ['', ...types].map((type) => `<button type="button" data-type="${escape(type)}">${type ? escape(name(type)) : 'Todos'}</button>`).join('');
             filters.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => render(button.dataset.type)));
             render('');
         };
@@ -240,6 +245,61 @@
                 });
             return loading;
         };
+        // A card's comments open under it; "Enviar comentário" opens the form (for the copies of the endless row too).
+        const dialog = document.getElementById('comment-dialog');
+        const form = dialog?.querySelector('form');
+        const message = dialog?.querySelector('.cmt-msg');
+        let commenting = null;
+        list.addEventListener('click', (event) => {
+            const toggle = event.target.closest('[data-talk]');
+            if (toggle) {
+                const box = toggle.nextElementSibling;
+                box.hidden = !box.hidden;
+                return;
+            }
+            const button = event.target.closest('[data-comment]');
+            if (!button || !dialog) return;
+            commenting = all.find((ad) => String(ad.id) === button.dataset.comment);
+            if (!commenting) return;
+            dialog.querySelector('.cmt-about').textContent = commenting.title;
+            message.textContent = '';
+            message.className = 'cmt-msg';
+            form.querySelector('[type="submit"]').disabled = false;
+            hold();
+            dialog.showModal();
+            form.elements.member_document.focus();
+        });
+        dialog?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => dialog.close()));
+        dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+        dialog?.addEventListener('close', () => release());
+        form?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!commenting) return;
+            const send = form.querySelector('[type="submit"]');
+            const say = (text, ok) => { message.textContent = text; message.className = 'cmt-msg ' + (ok ? 'is-ok' : 'is-error'); };
+            send.disabled = true;
+            try {
+                const response = await fetch(commenting.comments_url, {
+                    method: 'POST',
+                    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ member_document: form.elements.member_document.value, body: form.elements.body.value, website: form.elements.website.value }),
+                });
+                const answer = await response.json().catch(() => ({}));
+                if (response.ok) {
+                    say(answer.message || 'Obrigado! O seu comentário aparece no site depois de aprovado.', true);
+                    form.elements.body.value = '';
+                    return;
+                }
+                send.disabled = false;
+                if (response.status === 429) return say('Foram enviados muitos comentários seguidos. Tente de novo daqui a um minuto.');
+                const errors = Object.values(answer.errors || {}).flat();
+                say(errors[0] || 'Não foi possível enviar o comentário agora. Tente de novo mais tarde.');
+            } catch (e) {
+                send.disabled = false;
+                say('Não foi possível enviar o comentário agora. Verifique a ligação à internet.');
+            }
+        });
+
         const near = new IntersectionObserver((entries) => {
             if (entries.some((entry) => entry.isIntersecting)) { near.disconnect(); load(); }
         }, { rootMargin: '400px 0px' });
