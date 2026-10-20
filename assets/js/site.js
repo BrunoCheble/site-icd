@@ -258,27 +258,246 @@
         const form = dialog?.querySelector('form');
         const message = dialog?.querySelector('.cmt-msg');
         const gallery = document.getElementById('photo-dialog');
-        // The forms of the church's system (to announce, to be a member) open in a window of the site; their
-        // "Fechar" closes it.
-        const embedBox = document.getElementById('frame-dialog');
-        const frames = { announce: [ads.dataset.announce, 'Anunciar'], member: [ads.dataset.member, 'Ser membro'] };
-        const openFrame = (kind) => {
-            const [url, title] = frames[kind] || [];
-            if (!embedBox || !url) return false;
-            dialog?.open && dialog.close();
-            embedBox.querySelector('#frame-title').textContent = title;
-            embedBox.querySelector('iframe').title = title;
-            embedBox.querySelector('iframe').src = url + (url.includes('?') ? '&' : '?') + 'embed=1';
-            hold();
-            embedBox.showModal();
-            return true;
+        // The site's own forms to announce and to become a member, sent to the church's system (members by the NIF;
+        // both wait for the team). Errors show under their fields.
+        const API = new URL(ads.dataset.api).origin + '/api/public';
+        const announceBox = document.getElementById('announce-dialog');
+        const memberBox = document.getElementById('member-dialog');
+        const ICONS = { service: 'fa-tools', lessons: 'fa-graduation-cap', resume: 'fa-file-alt', job: 'fa-briefcase', donation: 'fa-hand-holding-heart', sale: 'fa-tag' };
+        const send = async (url, body) => {
+            const json = !(body instanceof FormData);
+            const response = await fetch(url, { method: 'POST', headers: json ? { Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json' }, body: json ? JSON.stringify(body) : body });
+            return { response, answer: await response.json().catch(() => ({})) };
         };
-        document.addEventListener('click', (event) => {
-            const opener = event.target.closest('[data-frame]');
-            if (opener && openFrame(opener.dataset.frame)) event.preventDefault();
+        const clearErrors = (box) => {
+            box.querySelectorAll('.field-error').forEach((error) => error.remove());
+            box.querySelectorAll('.has-error').forEach((field) => field.classList.remove('has-error'));
+            const note = box.querySelector('.cmt-msg');
+            note.textContent = '';
+            note.className = 'cmt-msg';
+        };
+        const fieldError = (field, text) => {
+            field.classList.add('has-error');
+            const error = document.createElement('p');
+            error.className = 'field-error';
+            error.textContent = text;
+            field.appendChild(error);
+        };
+        // The system's errors ("details.area", "photos.1"…) under their fields; the first one's field is returned.
+        const showErrors = (box, errors) => {
+            clearErrors(box);
+            let first = null;
+            Object.entries(errors || {}).forEach(([key, list]) => {
+                const field = box.querySelector(`[data-error-for="${key.replace(/\.\d+$/, '')}"]`);
+                if (!field) { box.querySelector('.cmt-msg').textContent = list[0]; box.querySelector('.cmt-msg').className = 'cmt-msg is-error'; return; }
+                if (!field.querySelector('.field-error')) fieldError(field, list[0]);
+                first = first || field;
+            });
+            return first;
+        };
+        const failed = (box, response) => {
+            const note = box.querySelector('.cmt-msg');
+            note.className = 'cmt-msg is-error';
+            note.textContent = response?.status === 429 ? 'Foram enviados muitos pedidos seguidos. Tente de novo daqui a um minuto.'
+                : 'Não foi possível enviar agora. Verifique a ligação à internet e tente de novo.';
+        };
+        const openBox = (box) => {
+            [dialog, announceBox, memberBox].forEach((other) => other !== box && other?.open && other.close());
+            hold();
+            if (!box.open) box.showModal();
+        };
+        const done = (box, answer) => {
+            box.querySelector('.form-body').hidden = true;
+            box.querySelector('form > .cmt-actions').hidden = true;
+            box.querySelector('.steps')?.setAttribute('hidden', '');
+            const panel = box.querySelector('.form-done');
+            panel.querySelector('h3').textContent = answer.title || 'Obrigado!';
+            panel.querySelector('.done-text').textContent = answer.message || '';
+            const note = panel.querySelector('.done-note');
+            if (note) note.textContent = answer.note || '';
+            panel.hidden = false;
+        };
+        const restart = (box) => {
+            box.querySelector('form').reset();
+            clearErrors(box);
+            box.querySelector('.form-body').hidden = false;
+            box.querySelector('form > .cmt-actions').hidden = false;
+            box.querySelector('.steps')?.removeAttribute('hidden');
+            box.querySelector('.form-done').hidden = true;
+        };
+
+        // ---- Announce ----
+        const aForm = announceBox?.querySelector('form');
+        const nifState = aForm?.querySelector('.nif-state');
+        let categories = null;
+        let photos = [];
+        let checkedNif = '';
+        const loadCategories = () => (categories = categories || fetch(API + '/announcement-categories', { headers: { Accept: 'application/json' } })
+            .then((response) => response.json()).then(({ data }) => data).catch(() => { categories = null; return {}; }));
+        const fieldHtml = (name, field) => {
+            const label = `<span class="lbl">${escape(field.label)}${field.required ? '' : ' <em>(opcional)</em>'}</span>`;
+            const attrs = `name="details[${escape(name)}]"${field.required ? ' required' : ''}`;
+            if (field.type === 'select' || field.type === 'yesno') {
+                const options = field.type === 'yesno' ? { 1: 'Sim', 0: 'Não' } : field.options;
+                return `<label class="cmt-field" data-error-for="details.${escape(name)}">${label}<select ${attrs}><option value="">Escolha…</option>${Object.entries(options).map(([value, text]) => `<option value="${escape(value)}">${escape(text)}</option>`).join('')}</select></label>`;
+            }
+            return `<label class="cmt-field" data-error-for="details.${escape(name)}">${label}<input ${attrs} maxlength="${field.max || 120}" placeholder="${escape(field.placeholder || '')}"></label>`;
+        };
+        const renderPhotos = () => {
+            aForm.querySelector('.photo-picks').innerHTML = photos.map((file, i) => `<span><img src="${URL.createObjectURL(file)}" alt=""><button type="button" data-unpick="${i}" aria-label="Remover foto"><i class="fas fa-times"></i></button></span>`).join('');
+            aForm.querySelector('.photo-add').hidden = photos.length >= 3;
+        };
+        const chooseCategory = async (key) => {
+            const category = (await loadCategories())[key];
+            if (!category) return;
+            aForm.querySelector('.cat-fields').innerHTML = Object.entries(category.fields).map(([name, field]) => fieldHtml(name, field)).join('');
+            aForm.querySelector('.photo-field').hidden = !category.photos;
+            aForm.querySelector('.pdf-field').hidden = !category.pdf;
+            aForm.querySelector('.sale-note').hidden = !category.limit;
+            if (!category.photos) { photos = []; renderPhotos(); }
+        };
+        const openAnnounce = async (nif = '') => {
+            if (!announceBox) return;
+            if (!announceBox.querySelector('.form-done').hidden) restart(announceBox);
+            openBox(announceBox);
+            const data = await loadCategories();
+            const grid = aForm.querySelector('.cat-grid');
+            if (!grid.children.length) {
+                grid.innerHTML = Object.entries(data).map(([key, category]) => `<label><input type="radio" name="type" value="${escape(key)}" required><span><i class="fas ${ICONS[key] || 'fa-bullhorn'}"></i>${escape(category.label)}</span></label>`).join('');
+            }
+            if (nif) { aForm.elements.member_document.value = nif; checkNif(); }
+        };
+        // The NIF checked once it has its 9 digits: a member's, or the registration offered.
+        const checkNif = async () => {
+            const nif = aForm.elements.member_document.value.replace(/\D/g, '');
+            if (nif.length !== 9) { nifState.hidden = true; checkedNif = ''; return; }
+            if (nif === checkedNif) return;
+            checkedNif = nif;
+            try {
+                const { exists } = await (await fetch(`${API}/members/check/${nif}`, { headers: { Accept: 'application/json' } })).json();
+                nifState.hidden = false;
+                nifState.className = 'nif-state ' + (exists ? 'is-ok' : 'is-off');
+                nifState.innerHTML = exists ? '<i class="fas fa-check-circle"></i> Membro encontrado.'
+                    : '<i class="fas fa-user-plus"></i> Não encontrámos este NIF nos membros. <button type="button" data-form="member">Registar como membro</button>';
+            } catch (e) { nifState.hidden = true; checkedNif = ''; }
+        };
+        aForm?.elements.member_document.addEventListener('input', checkNif);
+        aForm?.addEventListener('change', (event) => {
+            if (event.target.name === 'type') chooseCategory(event.target.value);
+            if (event.target.closest('.photo-add')) {
+                photos = [...photos, ...event.target.files].slice(0, 3);
+                event.target.value = '';
+                renderPhotos();
+            }
         });
-        window.addEventListener('message', (event) => {
-            if (event.data?.icd === 'close' && embedBox?.open && event.origin === new URL(ads.dataset.announce).origin) embedBox.close();
+        aForm?.addEventListener('click', (event) => {
+            const unpick = event.target.closest('[data-unpick]');
+            if (unpick) { photos.splice(Number(unpick.dataset.unpick), 1); renderPhotos(); }
+            if (event.target.closest('[data-again]')) { restart(announceBox); photos = []; renderPhotos(); aForm.querySelector('.cat-fields').innerHTML = ''; nifState.hidden = true; checkedNif = ''; }
+        });
+        aForm?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = aForm.querySelector('[type="submit"]');
+            const body = new FormData(aForm);
+            if (aForm.querySelector('.pdf-field').hidden || !aForm.elements.image_path.files.length) body.delete('image_path');
+            photos.forEach((file) => body.append('photos[]', file));
+            button.disabled = true;
+            try {
+                const { response, answer } = await send(API + '/announcements', body);
+                if (response.ok) { done(announceBox, answer); photos = []; return; }
+                if (response.status === 422) {
+                    const first = showErrors(announceBox, answer.errors);
+                    first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                } else failed(announceBox, response);
+            } catch (e) { failed(announceBox); }
+            finally { button.disabled = false; }
+        });
+
+        // ---- Become a member, in three steps ----
+        const mForm = memberBox?.querySelector('form');
+        let step = 1;
+        const birth = mForm?.elements.birthdate_picker;
+        if (birth) birth.max = new Date().toISOString().slice(0, 10);
+        const birthdate = () => (birth.value ? birth.value.split('-').reverse().join('/') : '');
+        const showStep = (n) => {
+            step = n;
+            mForm.querySelectorAll('.step').forEach((part) => { part.hidden = Number(part.dataset.step) !== n; });
+            mForm.querySelectorAll('.steps li').forEach((item, i) => { item.classList.toggle('is-on', i < n); });
+            mForm.querySelector('[data-back]').textContent = n === 1 ? 'Cancelar' : 'Voltar';
+            mForm.querySelector('[type="submit"] span').textContent = n === 3 ? 'Enviar registo' : 'Seguinte';
+            if (n === 3) {
+                const value = (name) => mForm.elements[name].value;
+                const rows = [['Nome', value('full_name')], ['Género', value('gender') === 'F' ? 'Feminino' : 'Masculino'], ['Nascimento', birthdate()], ['NIF', value('document_number')],
+                    ['Estado civil', mForm.elements.marital_status.selectedOptions[0]?.textContent], ['Telemóvel', value('phone_number')], ['E-mail', value('email')],
+                    ['Morada', `${value('address')} ${value('address_number')}, ${value('zip_code')} ${value('city')}`]];
+                mForm.querySelector('.review').innerHTML = rows.map(([label, text]) => `<div><dt>${label}</dt><dd>${escape(text)}</dd></div>`).join('');
+            }
+            memberBox.querySelector('.form-body').scrollTop = 0;
+        };
+        const openMember = (nif = '') => {
+            if (!memberBox) return;
+            if (!memberBox.querySelector('.form-done').hidden) restart(memberBox);
+            openBox(memberBox);
+            showStep(1);
+            if (nif && !mForm.elements.document_number.value) mForm.elements.document_number.value = nif;
+        };
+        // The fields of a step filled in (the system checks them all again).
+        const stepOk = (n) => {
+            clearErrors(memberBox);
+            let ok = true;
+            mForm.querySelectorAll(`.step[data-step="${n}"] [data-error-for]`).forEach((field) => {
+                const inputs = [...field.querySelectorAll('input, select')];
+                const filled = inputs.some((input) => (input.type === 'radio' ? input.checked : input.value.trim() !== ''));
+                if (!filled) { fieldError(field, 'Preencha este campo.'); ok = false; }
+            });
+            return ok;
+        };
+        mForm?.elements.zip_code.addEventListener('input', async (event) => {
+            const digits = event.target.value.replace(/\D/g, '').slice(0, 7);
+            event.target.value = digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
+            const state = mForm.querySelector('.zip-state');
+            if (digits.length !== 7) { state.textContent = ''; return; }
+            // The street and the place, from the postal code (they can be changed).
+            state.textContent = 'A procurar a morada…';
+            try {
+                const data = await (await fetch(`https://json.geoapi.pt/cp/${event.target.value}`)).json();
+                if (data.Localidade && !mForm.elements.city.value) mForm.elements.city.value = data.Localidade;
+                const street = data.partes?.[0]?.['Artéria'];
+                if (street && !mForm.elements.address.value) mForm.elements.address.value = street;
+                state.textContent = '';
+            } catch (e) { state.textContent = ''; }
+        });
+        mForm?.querySelector('[data-back]').addEventListener('click', () => (step === 1 ? memberBox.close() : showStep(step - 1)));
+        mForm?.addEventListener('click', (event) => {
+            if (event.target.closest('[data-announce-now]')) openAnnounce(mForm.elements.document_number.value.replace(/\D/g, ''));
+        });
+        mForm?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (step < 3) { if (stepOk(step)) showStep(step + 1); return; }
+            const button = mForm.querySelector('[type="submit"]');
+            const value = (name) => mForm.elements[name].value;
+            const body = { full_name: value('full_name'), gender: value('gender'), birthdate: birthdate(), document_number: value('document_number'), marital_status: value('marital_status'),
+                phone_number: value('phone_number'), email: value('email'), zip_code: value('zip_code'), address: value('address'), address_number: value('address_number'), city: value('city'), website: value('website') };
+            button.disabled = true;
+            try {
+                const { response, answer } = await send(API + '/members', body);
+                if (response.ok) { done(memberBox, answer); return; }
+                if (response.status === 422) {
+                    const first = showErrors(memberBox, answer.errors);
+                    const part = first?.closest('.step');
+                    if (part) { const errors = [...memberBox.querySelectorAll('.field-error')].map((e) => [e.parentElement, e.textContent]); showStep(Number(part.dataset.step)); errors.forEach(([field, text]) => fieldError(field, text)); }
+                } else failed(memberBox, response);
+            } catch (e) { failed(memberBox); }
+            finally { button.disabled = false; }
+        });
+
+        // The buttons that open them ("Anunciar", "Ser membro", the offers after a NIF that is not a member's).
+        document.addEventListener('click', (event) => {
+            const opener = event.target.closest('[data-form]');
+            if (!opener || !announceBox || !memberBox) return;
+            event.preventDefault();
+            const nif = (opener.closest('form')?.elements.member_document?.value || '').replace(/\D/g, '');
+            if (opener.dataset.form === 'member') openMember(nif); else openAnnounce();
         });
         let current = null;
         let mode = 'comment';
@@ -338,8 +557,7 @@
             if (event.key === 'ArrowLeft') showPhoto(photoAt - 1);
         });
         form?.querySelectorAll('[data-star]').forEach((star) => star.addEventListener('click', () => pick(Number(star.dataset.star))));
-        embedBox?.addEventListener('close', () => { embedBox.querySelector('iframe').src = 'about:blank'; });
-        [dialog, gallery, embedBox].forEach((box) => {
+        [dialog, gallery, announceBox, memberBox].forEach((box) => {
             box?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => box.close()));
             box?.addEventListener('click', (event) => { if (event.target === box) box.close(); });
             box?.addEventListener('close', () => release());

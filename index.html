@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610210013">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610210028">
 </head>
 
 <body>
@@ -249,8 +249,8 @@
                     <p>Os membros podem anunciar os seus serviços, aulas, o seu currículo, uma oferta de emprego, uma doação ou algo para venda. O anúncio aparece aqui depois de aprovado pela equipa.</p>
                 </div>
                 <div class="board-cta-actions">
-                    <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener" data-frame="announce"><i class="fas fa-bullhorn"></i> Anunciar</a>
-                    <a class="btn btn-light" href="https://admin.igrejaicd.pt/" target="_blank" rel="noopener" data-frame="member"><i class="fas fa-user-plus"></i> Ser membro</a>
+                    <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener" data-form="announce"><i class="fas fa-bullhorn"></i> Anunciar</a>
+                    <a class="btn btn-light" href="https://admin.igrejaicd.pt/" target="_blank" rel="noopener" data-form="member"><i class="fas fa-user-plus"></i> Ser membro</a>
                 </div>
             </div>
         </div>
@@ -274,20 +274,101 @@
                 <p class="cmt-note" data-mode="comment"><i class="fas fa-lock"></i> Este comentário é <strong>privado</strong>: vai só para os administradores da igreja e não aparece no site.</p>
                 <p class="cmt-note" data-mode="rate"><i class="fas fa-info-circle"></i> Só os membros podem avaliar, uma vez por anúncio. Se avaliar de novo, a sua nota anterior é substituída.</p>
                 <p class="cmt-msg" role="status"></p>
-                <p class="cmt-join">Ainda não é membro? <button type="button" data-frame="member">Registe-se aqui</button></p>
+                <p class="cmt-join">Ainda não é membro? <button type="button" data-form="member">Registe-se aqui</button></p>
                 <div class="cmt-actions">
                     <button type="button" class="btn btn-ghost" data-cmt-close>Fechar</button>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
                 </div>
             </form>
         </dialog>
-        <!-- The forms of the church's system (to announce, to be a member), inside the site -->
-        <dialog class="frame" id="frame-dialog" aria-labelledby="frame-title">
-            <div class="frame-head">
-                <h3 id="frame-title"></h3>
-                <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
-            </div>
-            <iframe title="" loading="lazy"></iframe>
+        <!-- To announce (members, by the NIF; it waits for the team's approval): the categories and their fields come from the system -->
+        <dialog class="cmt form-dlg" id="announce-dialog" aria-labelledby="announce-title">
+            <form class="cmt-box" novalidate>
+                <div class="cmt-head">
+                    <div><h3 id="announce-title">Anunciar</h3><p class="cmt-about">Serviços, aulas, currículos, ofertas de emprego, doações e vendas dos membros. O anúncio aparece no site depois de aprovado pela equipa.</p></div>
+                    <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="form-body">
+                    <label class="cmt-field" data-error-for="member_document">O seu NIF (membro)<input name="member_document" inputmode="numeric" maxlength="9" autocomplete="off" required></label>
+                    <p class="nif-state" hidden></p>
+                    <div class="cmt-field" data-error-for="type"><span>Categoria</span><div class="cat-grid" role="radiogroup" aria-label="Categoria"></div></div>
+                    <div class="cat-fields"></div>
+                    <label class="cmt-field" data-error-for="title">Título<input name="title" maxlength="255" required></label>
+                    <label class="cmt-field" data-error-for="description">Descrição<textarea name="description" rows="5" maxlength="5000" required></textarea><small>Escreva à sua maneira: a equipa revê cada anúncio antes de aparecer no site.</small></label>
+                    <div class="form-row">
+                        <label class="cmt-field" data-error-for="contact">Telemóvel<input name="contact" type="tel" inputmode="tel" placeholder="912 345 678" required><small>Aparece com o anúncio, para quem tiver interesse.</small></label>
+                        <label class="cmt-field" data-error-for="link"><span class="lbl">Link <em>(opcional)</em></span><input name="link" maxlength="255" placeholder="https://"></label>
+                    </div>
+                    <div class="cmt-field photo-field" data-error-for="photos" hidden><span class="lbl">Fotos <em>(opcional, até 3)</em></span>
+                        <div class="photo-picks"></div>
+                        <label class="photo-add"><i class="fas fa-camera"></i> Escolher fotos<input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+                        <small>Aparecem numa galeria no anúncio; o cartão mantém a imagem da categoria.</small>
+                    </div>
+                    <label class="cmt-field pdf-field" data-error-for="image_path" hidden><span class="lbl">Currículo em PDF <em>(opcional)</em></span><input name="image_path" type="file" accept="application/pdf,.pdf"></label>
+                    <p class="cmt-note sale-note" hidden><i class="fas fa-info-circle"></i> Cada membro pode ter até 3 vendas anunciadas ao mesmo tempo.</p>
+                    <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+                    <p class="cmt-msg" role="status"></p>
+                </div>
+                <div class="cmt-actions">
+                    <button type="button" class="btn btn-ghost" data-cmt-close>Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar para aprovação</button>
+                </div>
+                <div class="form-done" hidden>
+                    <div class="done-icon"><i class="fas fa-check"></i></div>
+                    <h3></h3><p class="done-text"></p><p class="done-note"></p>
+                    <div class="cmt-actions"><button type="button" class="btn btn-ghost" data-again>Anunciar outro</button><button type="button" class="btn btn-primary" data-cmt-close>Fechar</button></div>
+                </div>
+            </form>
+        </dialog>
+        <!-- To become a member (waiting for the team to confirm), in three steps -->
+        <dialog class="cmt form-dlg" id="member-dialog" aria-labelledby="member-title">
+            <form class="cmt-box" novalidate>
+                <div class="cmt-head">
+                    <div><h3 id="member-title">Ser membro</h3><p class="cmt-about">Registe-se como membro da Igreja Cidade de David. A equipa confirma o registo.</p></div>
+                    <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+                </div>
+                <ol class="steps"><li class="is-on">Dados pessoais</li><li>Morada</li><li>Confirmar</li></ol>
+                <div class="form-body">
+                    <div class="step" data-step="1">
+                        <label class="cmt-field" data-error-for="full_name">Nome completo<input name="full_name" autocomplete="name" maxlength="150" required></label>
+                        <div class="cmt-field" data-error-for="gender"><span>Género</span><div class="seg"><label><input type="radio" name="gender" value="M"><span>Masculino</span></label><label><input type="radio" name="gender" value="F"><span>Feminino</span></label></div></div>
+                        <div class="form-row">
+                            <label class="cmt-field" data-error-for="birthdate">Data de nascimento<input name="birthdate_picker" type="date" max="" required></label>
+                            <label class="cmt-field" data-error-for="document_number">NIF<input name="document_number" inputmode="numeric" maxlength="9" autocomplete="off" required></label>
+                        </div>
+                        <div class="form-row">
+                            <label class="cmt-field" data-error-for="marital_status">Estado civil<select name="marital_status" required><option value="">Escolha…</option><option value="S">Solteiro(a)</option><option value="M">Casado(a)</option><option value="D">Divorciado(a)</option><option value="W">Viúvo(a)</option></select></label>
+                            <label class="cmt-field" data-error-for="phone_number">Telemóvel<input name="phone_number" type="tel" inputmode="tel" autocomplete="tel" placeholder="912 345 678" required></label>
+                        </div>
+                        <label class="cmt-field" data-error-for="email">E-mail<input name="email" type="email" autocomplete="email" required></label>
+                    </div>
+                    <div class="step" data-step="2" hidden>
+                        <div class="form-row">
+                            <label class="cmt-field" data-error-for="zip_code">Código postal<input name="zip_code" inputmode="numeric" autocomplete="postal-code" placeholder="1234-567" maxlength="8" required><small class="zip-state"></small></label>
+                            <label class="cmt-field" data-error-for="city">Localidade<input name="city" autocomplete="address-level2" required></label>
+                        </div>
+                        <div class="form-row is-wide">
+                            <label class="cmt-field" data-error-for="address">Rua<input name="address" autocomplete="address-line1" required></label>
+                            <label class="cmt-field" data-error-for="address_number">N.º / andar<input name="address_number" required></label>
+                        </div>
+                    </div>
+                    <div class="step" data-step="3" hidden>
+                        <dl class="review"></dl>
+                        <p class="cmt-note"><i class="fas fa-info-circle"></i> Ao enviar, os seus dados ficam guardados no sistema da igreja, só para a vida da comunidade.</p>
+                    </div>
+                    <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+                    <p class="cmt-msg" role="status"></p>
+                </div>
+                <div class="cmt-actions">
+                    <button type="button" class="btn btn-ghost" data-back>Voltar</button>
+                    <button type="submit" class="btn btn-primary"><span>Seguinte</span> <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="form-done" hidden>
+                    <div class="done-icon"><i class="fas fa-heart"></i></div>
+                    <h3></h3><p class="done-text"></p>
+                    <div class="cmt-actions"><button type="button" class="btn btn-ghost" data-cmt-close>Fechar</button><button type="button" class="btn btn-primary" data-announce-now><i class="fas fa-bullhorn"></i> Anunciar agora</button></div>
+                </div>
+            </form>
         </dialog>
         <!-- The photos of a donation or a sale -->
         <dialog class="photo" id="photo-dialog" aria-label="Fotos do anúncio">
@@ -541,7 +622,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610210013"></script>
+    <script src="assets/js/site.js?v=202610210028"></script>
 </body>
 
 </html>
