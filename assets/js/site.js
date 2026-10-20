@@ -112,11 +112,12 @@
 
         const stars = (value) => [1, 2, 3, 4, 5].map((n) => `<i class="${value >= n - .25 ? 'fas fa-star' : value >= n - .75 ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>`).join('');
         const card = (ad) => {
-            // The picture (the first photo of a donation or a sale, otherwise the category's), its fields as tags, the
-            // ways to reach whoever announced, the members' stars, and a private comment for the church's team.
+            // The category's picture (always: a donation's or a sale's photos go apart, as thumbnails that open a
+            // gallery), its fields as tags, the ways to reach whoever announced, the members' stars, and a private
+            // comment for the church's team.
             const photos = ad.photos || [];
-            const media = `<div class="post-media"${photos.length ? ` data-gallery="${escape(ad.id)}" role="button" tabindex="0" aria-label="Ver fotos"` : ''}><img src="${escape(ad.image_url)}" alt="" loading="lazy">
-                <span class="post-type">${escape(ad.type_name)}</span>${photos.length > 1 ? `<span class="post-count"><i class="fas fa-images"></i> ${photos.length}</span>` : ''}</div>`;
+            const media = `<div class="post-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="post-type">${escape(ad.type_name)}</span></div>`;
+            const thumbs = photos.length ? `<div class="post-photos">${photos.map((url, i) => `<button type="button" data-gallery="${escape(ad.id)}" data-at="${i}" aria-label="Ver foto ${i + 1}"><img src="${escape(url)}" alt="" loading="lazy"></button>`).join('')}</div>` : '';
             const tags = (ad.details || []).map((line) => `<span title="${escape(line.label)}">${escape(line.short || line.value)}</span>`).join('');
             const actions = [
                 ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
@@ -132,7 +133,7 @@
                    <button type="button" class="post-comment" data-comment="${escape(ad.id)}"><i class="fas fa-lock"></i> Comentário privado para a equipa</button>`
                 : '';
             return `<article class="post">${media}<div class="post-body"><h3>${escape(ad.title)}</h3><p class="post-text">${escape(ad.description)}</p>
-                <button type="button" class="post-more" hidden>Ver mais</button>${tags ? `<div class="post-tags">${tags}</div>` : ''}
+                <button type="button" class="post-more" hidden>Ver mais</button>${thumbs}${tags ? `<div class="post-tags">${tags}</div>` : ''}
                 <div class="post-actions">${actions}</div><div class="post-talk">${talk}</div></div></article>`;
         };
         // The row goes round by itself: the cards are repeated enough times to fill it, and once a whole set has
@@ -293,24 +294,20 @@
             dialog.showModal();
             form.elements.member_document.focus();
         };
-        const openGallery = (ad) => {
+        const openGallery = (ad, at = 0) => {
             if (!gallery || !(ad?.photos || []).length) return;
             current = ad;
-            showPhoto(0);
+            showPhoto(at);
             hold();
             gallery.showModal();
         };
         list.addEventListener('click', (event) => {
-            const media = event.target.closest('[data-gallery]');
-            if (media) return openGallery(find(media.dataset.gallery));
+            const thumb = event.target.closest('[data-gallery]');
+            if (thumb) return openGallery(find(thumb.dataset.gallery), Number(thumb.dataset.at) || 0);
             const rate = event.target.closest('[data-rate]');
             const comment = event.target.closest('[data-comment]');
             const ad = find((rate || comment)?.dataset.rate || (rate || comment)?.dataset.comment);
             if (ad && dialog) openForm(ad, rate ? 'rate' : 'comment');
-        });
-        list.addEventListener('keydown', (event) => {
-            const media = event.target.closest('[data-gallery]');
-            if (media && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openGallery(find(media.dataset.gallery)); }
         });
         gallery?.querySelectorAll('[data-photo]').forEach((arrow) => arrow.addEventListener('click', () => showPhoto(photoAt + Number(arrow.dataset.photo))));
         gallery?.addEventListener('keydown', (event) => {
