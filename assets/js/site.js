@@ -428,7 +428,7 @@
             if (n === 3) {
                 const value = (name) => mForm.elements[name].value;
                 const rows = [['Nome', value('full_name')], ['Género', value('gender') === 'F' ? 'Feminino' : 'Masculino'], ['Nascimento', birthdate()], ['NIF', value('document_number')],
-                    ['Estado civil', mForm.elements.marital_status.selectedOptions[0]?.textContent], ['Telemóvel', value('phone_number')], ['E-mail', value('email')],
+                    ['Estado civil', mForm.elements.marital_status.selectedOptions[0]?.textContent], ['Telemóvel', value('phone_number')], ['E-mail', value('email') || '—'],
                     ['Morada', `${value('address')} ${value('address_number')}, ${value('zip_code')} ${value('city')}`]];
                 mForm.querySelector('.review').innerHTML = rows.map(([label, text]) => `<div><dt>${label}</dt><dd>${escape(text)}</dd></div>`).join('');
             }
@@ -445,7 +445,7 @@
         const stepOk = (n) => {
             clearErrors(memberBox);
             let ok = true;
-            mForm.querySelectorAll(`.step[data-step="${n}"] [data-error-for]`).forEach((field) => {
+            mForm.querySelectorAll(`.step[data-step="${n}"] [data-error-for]:not([data-optional])`).forEach((field) => {
                 const inputs = [...field.querySelectorAll('input, select')];
                 const filled = inputs.some((input) => (input.type === 'radio' ? input.checked : input.value.trim() !== ''));
                 if (!filled) { fieldError(field, 'Preencha este campo.'); ok = false; }

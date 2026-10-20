@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610210028">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610210031">
 </head>
 
 <body>
@@ -340,7 +340,7 @@
                             <label class="cmt-field" data-error-for="marital_status">Estado civil<select name="marital_status" required><option value="">Escolha…</option><option value="S">Solteiro(a)</option><option value="M">Casado(a)</option><option value="D">Divorciado(a)</option><option value="W">Viúvo(a)</option></select></label>
                             <label class="cmt-field" data-error-for="phone_number">Telemóvel<input name="phone_number" type="tel" inputmode="tel" autocomplete="tel" placeholder="912 345 678" required></label>
                         </div>
-                        <label class="cmt-field" data-error-for="email">E-mail<input name="email" type="email" autocomplete="email" required></label>
+                        <label class="cmt-field" data-error-for="email" data-optional><span class="lbl">E-mail <em>(opcional)</em></span><input name="email" type="email" autocomplete="email"></label>
                     </div>
                     <div class="step" data-step="2" hidden>
                         <div class="form-row">
@@ -622,7 +622,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610210028"></script>
+    <script src="assets/js/site.js?v=202610210031"></script>
 </body>
 
 </html>
