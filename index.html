@@ -49,6 +49,7 @@
                 <a href="#top" class="is-active">Home</a>
                 <a href="#about-us">Sobre Nós</a>
                 <a href="#ministries">Ministérios</a>
+                <a href="#announcements">Anúncios</a>
                 <a href="#schedule">Horários</a>
                 <a href="#pastors">Pastores</a>
                 <a href="#contact-us">Onde estamos</a>
@@ -226,6 +227,28 @@
     <p>O Ensino em nossa igreja está a cargo da ICD TEOLÓGICA. Ela é responsável por transmitir o conhecimento da Palavra de Deus, promovendo crescimento espiritual, maturidade na fé e capacitação para a vida cristã. Neste sentido, a ICD TEOLÓGICA desempenha um papel crucial na formação de discípulos e na edificação da igreja como um todo.</p>
     <button type="button" class="ministry-more" data-open="theologicalModal">Saiba Mais <i class="fas fa-arrow-right"></i></button>
 </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Announcements of the members, from the church's system (approved ones); anyone who is a member can announce -->
+    <section class="section" id="announcements" data-api="https://admin.igrejaicd.pt/api/public/announcements" data-announce="https://admin.igrejaicd.pt/announcement">
+        <div class="wrap">
+            <div class="heading reveal">
+                <img src="assets/images/logo-min.png" alt="Anúncios">
+                <h2>Anúncios da <em>Comunidade</em></h2>
+                <p>Serviços, produtos, doações e currículos dos membros da igreja.</p>
+            </div>
+            <div class="ads-filters" role="tablist" aria-label="Tipo de anúncio" hidden></div>
+            <div class="ads" aria-live="polite">
+                <div class="ads-loading"><i class="fas fa-spinner fa-spin"></i> A carregar anúncios…</div>
+            </div>
+            <div class="ads-cta reveal">
+                <div>
+                    <h3>Tem algo para partilhar com a comunidade?</h3>
+                    <p>Os membros podem anunciar um serviço, um produto, uma doação ou o seu currículo. O anúncio aparece aqui depois de aprovado pela equipa.</p>
+                </div>
+                <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener"><i class="fas fa-bullhorn"></i> Anunciar</a>
             </div>
         </div>
     </section>

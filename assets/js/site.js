@@ -96,6 +96,75 @@
     });
     window.addEventListener('popstate', () => document.querySelectorAll('.dlg[open]').forEach((dialog) => dialog.close()));
 
+    // Members' announcements, from the church's system. Asked once, only when the section comes near, never twice at
+    // the same time, and kept in this browser for 10 minutes (the system caches them too).
+    const ads = document.getElementById('announcements');
+    if (ads) {
+        const KEY = 'icd-announcements';
+        const KEEP = 10 * 60 * 1000;
+        const list = ads.querySelector('.ads');
+        const filters = ads.querySelector('.ads-filters');
+        const icons = { resume: 'fa-file-alt', service: 'fa-tools', donation: 'fa-hand-holding-heart', product: 'fa-tag' };
+        const names = { resume: 'Currículo', service: 'Serviço', donation: 'Doação', product: 'Produto' };
+        const escape = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const safeUrl = (url) => (/^https?:\/\//i.test(url || '') ? url : (url ? 'https://' + url : ''));
+        let loading = null;
+        let all = [];
+
+        const card = (ad) => {
+            const media = ad.image_url && !ad.is_pdf
+                ? `<div class="ad-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`
+                : `<div class="ad-media is-plain"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
+            const actions = [
+                ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
+                ad.link ? `<a class="is-link" href="${escape(safeUrl(ad.link))}" target="_blank" rel="noopener nofollow"><i class="fas fa-external-link-alt"></i> Link</a>` : '',
+                ad.image_url && ad.is_pdf ? `<a class="is-link" href="${escape(ad.image_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PDF</a>` : '',
+            ].join('');
+            return `<article class="ad">${media}<div class="ad-body"><h3>${escape(ad.title)}</h3><p class="ad-text">${escape(ad.description)}</p>
+                <button type="button" class="ad-more" hidden>Ver mais</button><div class="ad-actions">${actions}</div></div></article>`;
+        };
+        const render = (type) => {
+            const shown = type ? all.filter((ad) => ad.type === type) : all;
+            list.innerHTML = shown.length ? shown.map(card).join('')
+                : `<div class="ads-empty"><i class="fas fa-bullhorn"></i>Ainda não há anúncios. Seja o primeiro a anunciar!</div>`;
+            // "Ver mais" only where the text is cut.
+            list.querySelectorAll('.ad').forEach((ad) => {
+                const text = ad.querySelector('.ad-text');
+                const more = ad.querySelector('.ad-more');
+                if (text.scrollHeight > text.clientHeight + 2) more.hidden = false;
+                more.addEventListener('click', () => { const open = ad.classList.toggle('is-open'); more.textContent = open ? 'Ver menos' : 'Ver mais'; });
+            });
+            filters.querySelectorAll('button').forEach((button) => button.classList.toggle('is-active', (button.dataset.type || '') === (type || '')));
+        };
+        const show = (data) => {
+            all = data;
+            const types = [...new Set(all.map((ad) => ad.type))];
+            filters.hidden = types.length < 2;
+            filters.innerHTML = ['', ...types].map((type) => `<button type="button" data-type="${type}">${type ? escape(names[type] || type) : 'Todos'}</button>`).join('');
+            filters.querySelectorAll('button').forEach((button) => button.addEventListener('click', () => render(button.dataset.type)));
+            render('');
+        };
+        const load = () => {
+            if (loading) return loading;
+            try {
+                const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+                if (saved && Date.now() - saved.at < KEEP) { show(saved.data); return (loading = Promise.resolve()); }
+            } catch (e) { /* no storage here: asked to the system */ }
+            loading = fetch(ads.dataset.api, { headers: { Accept: 'application/json' } })
+                .then((response) => { if (!response.ok) throw new Error(response.status); return response.json(); })
+                .then(({ data }) => {
+                    try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data })); } catch (e) { /* not kept */ }
+                    show(data);
+                })
+                .catch(() => { list.innerHTML = '<div class="ads-empty"><i class="fas fa-wifi"></i>Não foi possível carregar os anúncios agora.</div>'; });
+            return loading;
+        };
+        const near = new IntersectionObserver((entries) => {
+            if (entries.some((entry) => entry.isIntersecting)) { near.disconnect(); load(); }
+        }, { rootMargin: '400px 0px' });
+        near.observe(ads);
+    }
+
     // Cards and blocks appear as the page scrolls.
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); reveal.unobserve(entry.target); }
