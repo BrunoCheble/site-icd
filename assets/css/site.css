@@ -249,10 +249,14 @@ body.has-dialog { overflow: hidden; }
 .ads-filters { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin: -1rem 0 2rem; }
 .ads-filters button { min-height: 40px; padding: 0 1rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--text); font: inherit; font-size: .9rem; font-weight: 700; cursor: pointer; }
 .ads-filters button.is-active { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
-.ads { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr)); gap: 1.25rem; align-items: start; }
-.ads-loading, .ads-empty { grid-column: 1 / -1; padding: 2.5rem 1rem; border: 1px dashed var(--line); border-radius: var(--radius); text-align: center; color: var(--muted); }
+/* An endless row that moves by itself (and by hand); with few announcements it stands still, centered. */
+.ads { display: flex; align-items: flex-start; gap: 1.25rem; padding: .5rem 0 1rem; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.ads::-webkit-scrollbar { display: none; }
+.ads.is-static { flex-wrap: wrap; justify-content: center; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+.ads-loading, .ads-empty { flex: 1; padding: 2.5rem 1rem; border: 1px dashed var(--line); border-radius: var(--radius); text-align: center; color: var(--muted); }
 .ads-empty i { display: block; margin-bottom: .6rem; font-size: 1.8rem; color: #cbd5e1; }
-.ad { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; transition: transform .2s, box-shadow .2s; }
+.ad { flex: 0 0 min(19rem, 82vw); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; transition: transform .2s, box-shadow .2s; }
 .ad:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
 .ad-media { position: relative; aspect-ratio: 16 / 10; background: linear-gradient(135deg, var(--brand-soft), #fff7ed); display: grid; place-items: center; color: var(--brand-dark); font-size: 2.2rem; }
 .ad-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }

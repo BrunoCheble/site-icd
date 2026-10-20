@@ -124,21 +124,98 @@
             return `<article class="ad">${media}<div class="ad-body"><h3>${escape(ad.title)}</h3><p class="ad-text">${escape(ad.description)}</p>
                 <button type="button" class="ad-more" hidden>Ver mais</button><div class="ad-actions">${actions}</div></div></article>`;
         };
+        // The row goes round by itself: the cards are repeated enough times to fill it, and once a whole set has
+        // passed it jumps back by that set (they look the same, so it never ends). It stops while the mouse is over
+        // it, while it is touched or dragged, and on a focused card; with few cards (or reduced motion) it stands still.
+        const SPEED = 35; // px per second
+        const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let shownCards = [];
+        let setWidth = 0;
+        let pos = 0;
+        let resumeAt = 0;
+        let frame = null;
+        let visible = false;
+        let last = 0;
+        const hold = () => { resumeAt = Infinity; };
+        const release = (delay = 2500) => { resumeAt = performance.now() + delay; };
+        const wrap = () => {
+            if (!setWidth) return;
+            if (list.scrollLeft >= setWidth) list.scrollLeft -= setWidth;
+            else if (list.scrollLeft <= 0) list.scrollLeft += setWidth;
+        };
+        const tick = (now) => {
+            frame = null;
+            if (!setWidth || !visible) return;
+            const dt = Math.min(now - (last || now), 100);
+            last = now;
+            if (now >= resumeAt && !still.matches) {
+                if (resumeAt) { pos = list.scrollLeft; resumeAt = 0; }
+                pos += (SPEED * dt) / 1000;
+                if (pos >= setWidth) pos -= setWidth;
+                list.scrollLeft = pos;
+            }
+            frame = requestAnimationFrame(tick);
+        };
+        const run = () => { if (!frame && setWidth && visible) { last = 0; frame = requestAnimationFrame(tick); } };
+        const loop = () => {
+            setWidth = 0;
+            list.classList.add('is-static');
+            list.querySelectorAll('[data-copy]').forEach((copy) => copy.remove());
+            const cards = [...list.querySelectorAll('.ad')];
+            if (cards.length < 2) return;
+            const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+            const width = cards.reduce((sum, ad) => sum + ad.offsetWidth + gap, 0);
+            list.classList.remove('is-static');
+            if (width <= list.clientWidth) { list.classList.add('is-static'); return; }
+            // Copies: hidden from screen readers and out of the tab order; "Ver mais" works on them too.
+            const copies = Math.ceil(list.clientWidth / width) + 1;
+            for (let n = 0; n < copies; n++) {
+                cards.forEach((ad) => {
+                    const copy = ad.cloneNode(true);
+                    copy.dataset.copy = '';
+                    copy.setAttribute('aria-hidden', 'true');
+                    copy.querySelectorAll('a, button').forEach((el) => el.setAttribute('tabindex', '-1'));
+                    list.appendChild(copy);
+                });
+            }
+            list.querySelectorAll('.ad').forEach(more);
+            setWidth = width;
+            pos = list.scrollLeft = 0;
+            run();
+        };
+        // "Ver mais" only where the text is cut.
+        const more = (ad) => {
+            const text = ad.querySelector('.ad-text');
+            const button = ad.querySelector('.ad-more');
+            if (button.dataset.ready) return;
+            button.dataset.ready = '1';
+            if (text.scrollHeight > text.clientHeight + 2) button.hidden = false;
+            button.addEventListener('click', () => { const open = ad.classList.toggle('is-open'); button.textContent = open ? 'Ver menos' : 'Ver mais'; });
+        };
+        list.addEventListener('mouseenter', hold);
+        list.addEventListener('mouseleave', () => release(600));
+        list.addEventListener('pointerdown', hold);
+        list.addEventListener('touchstart', hold, { passive: true });
+        list.addEventListener('touchend', () => release());
+        list.addEventListener('focusin', hold);
+        list.addEventListener('focusout', () => release());
+        list.addEventListener('scroll', () => { if (resumeAt) wrap(); }, { passive: true });
+        new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; run(); }).observe(list);
+        let resized;
+        window.addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(() => shownCards.length && loop(), 200); });
+
         const render = (type) => {
-            const shown = type ? all.filter((ad) => ad.type === type) : all;
-            list.innerHTML = shown.length ? shown.map(card).join('')
+            shownCards = type ? all.filter((ad) => ad.type === type) : all;
+            list.innerHTML = shownCards.length ? shownCards.map(card).join('')
                 : `<div class="ads-empty"><i class="fas fa-bullhorn"></i>Ainda não há anúncios. Seja o primeiro a anunciar!</div>`;
-            // "Ver mais" only where the text is cut.
-            list.querySelectorAll('.ad').forEach((ad) => {
-                const text = ad.querySelector('.ad-text');
-                const more = ad.querySelector('.ad-more');
-                if (text.scrollHeight > text.clientHeight + 2) more.hidden = false;
-                more.addEventListener('click', () => { const open = ad.classList.toggle('is-open'); more.textContent = open ? 'Ver menos' : 'Ver mais'; });
-            });
+            list.querySelectorAll('.ad').forEach(more);
+            loop();
             filters.querySelectorAll('button').forEach((button) => button.classList.toggle('is-active', (button.dataset.type || '') === (type || '')));
         };
+        // The ones about to expire first; those without an end date last (newest first among equals, as the system sends them).
+        const ending = (ad) => ad.expires_at ? String(ad.expires_at).slice(0, 10) : '9999-12-31';
         const show = (data) => {
-            all = data;
+            all = [...data].sort((a, b) => ending(a).localeCompare(ending(b)));
             const types = [...new Set(all.map((ad) => ad.type))];
             filters.hidden = types.length < 2;
             filters.innerHTML = ['', ...types].map((type) => `<button type="button" data-type="${type}">${type ? escape(names[type] || type) : 'Todos'}</button>`).join('');
