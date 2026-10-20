@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610210031">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610210037">
 </head>
 
 <body>
@@ -289,22 +289,39 @@
                     <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
                 </div>
                 <div class="form-body">
-                    <label class="cmt-field" data-error-for="member_document">O seu NIF (membro)<input name="member_document" inputmode="numeric" maxlength="9" autocomplete="off" required></label>
-                    <p class="nif-state" hidden></p>
-                    <div class="cmt-field" data-error-for="type"><span>Categoria</span><div class="cat-grid" role="radiogroup" aria-label="Categoria"></div></div>
-                    <div class="cat-fields"></div>
-                    <label class="cmt-field" data-error-for="title">Título<input name="title" maxlength="255" required></label>
-                    <label class="cmt-field" data-error-for="description">Descrição<textarea name="description" rows="5" maxlength="5000" required></textarea><small>Escreva à sua maneira: a equipa revê cada anúncio antes de aparecer no site.</small></label>
-                    <div class="form-row">
-                        <label class="cmt-field" data-error-for="contact">Telemóvel<input name="contact" type="tel" inputmode="tel" placeholder="912 345 678" required><small>Aparece com o anúncio, para quem tiver interesse.</small></label>
-                        <label class="cmt-field" data-error-for="link"><span class="lbl">Link <em>(opcional)</em></span><input name="link" maxlength="255" placeholder="https://"></label>
-                    </div>
-                    <div class="cmt-field photo-field" data-error-for="photos" hidden><span class="lbl">Fotos <em>(opcional, até 3)</em></span>
-                        <div class="photo-picks"></div>
-                        <label class="photo-add"><i class="fas fa-camera"></i> Escolher fotos<input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
-                        <small>Aparecem numa galeria no anúncio; o cartão mantém a imagem da categoria.</small>
-                    </div>
-                    <label class="cmt-field pdf-field" data-error-for="image_path" hidden><span class="lbl">Currículo em PDF <em>(opcional)</em></span><input name="image_path" type="file" accept="application/pdf,.pdf"></label>
+                    <section class="form-part">
+                        <h4><span>1</span> Quem anuncia</h4>
+                        <label class="cmt-field" data-error-for="member_document"><span class="lbl">O seu NIF <em>(só membros podem anunciar)</em></span><input name="member_document" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="123456789" required></label>
+                        <p class="nif-state" hidden></p>
+                    </section>
+                    <section class="form-part">
+                        <h4><span>2</span> Categoria</h4>
+                        <div class="cmt-field" data-error-for="type"><div class="cat-grid" role="radiogroup" aria-label="Categoria"></div></div>
+                        <p class="form-hint" data-before-category><i class="fas fa-hand-pointer"></i> Escolha uma categoria para continuar.</p>
+                    </section>
+                    <section class="form-part" data-after-category hidden>
+                        <h4><span>3</span> O anúncio</h4>
+                        <div class="cat-fields"></div>
+                        <label class="cmt-field" data-error-for="title"><span class="lbl">Título</span><input name="title" maxlength="80" required></label>
+                        <label class="cmt-field" data-error-for="description"><span class="lbl">Descrição <small class="count">0 / 1000</small></span><textarea name="description" rows="5" maxlength="1000" required></textarea><small>Escreva à sua maneira: a equipa revê cada anúncio antes de aparecer no site.</small></label>
+                    </section>
+                    <section class="form-part" data-after-category hidden>
+                        <h4><span>4</span> Contacto</h4>
+                        <div class="form-row">
+                            <label class="cmt-field" data-error-for="contact"><span class="lbl">Telemóvel / WhatsApp</span><input name="contact" type="tel" inputmode="tel" autocomplete="tel" placeholder="912 345 678" required><small>Aparece no anúncio, para quem tiver interesse.</small></label>
+                            <label class="cmt-field" data-error-for="link"><span class="lbl">Link <em>(opcional)</em></span><input name="link" maxlength="255" inputmode="url" placeholder="Site, Instagram, LinkedIn…"></label>
+                        </div>
+                    </section>
+                    <section class="form-part photo-field" data-error-for="photos" hidden>
+                        <h4><span>5</span> Fotos <em>(opcional, até 3)</em></h4>
+                        <div class="photo-slots"></div>
+                        <input class="photo-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+                        <small class="form-hint">Aparecem numa galeria no anúncio; o cartão mantém a imagem da categoria.</small>
+                    </section>
+                    <section class="form-part pdf-field" hidden>
+                        <h4><span>5</span> Currículo <em>(opcional)</em></h4>
+                        <label class="cmt-field file-pick" data-error-for="image_path"><span class="lbl"><i class="fas fa-file-pdf"></i> <b class="file-name">Escolher o currículo em PDF</b></span><input name="image_path" type="file" accept="application/pdf,.pdf"></label>
+                    </section>
                     <p class="cmt-note sale-note" hidden><i class="fas fa-info-circle"></i> Cada membro pode ter até 3 vendas anunciadas ao mesmo tempo.</p>
                     <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
                     <p class="cmt-msg" role="status"></p>
@@ -622,7 +639,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610210031"></script>
+    <script src="assets/js/site.js?v=202610210037"></script>
 </body>
 
 </html>

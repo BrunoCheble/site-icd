@@ -343,22 +343,51 @@
             }
             return `<label class="cmt-field" data-error-for="details.${escape(name)}">${label}<input ${attrs} maxlength="${field.max || 120}" placeholder="${escape(field.placeholder || '')}"></label>`;
         };
+        // Examples of a title and a description, by category.
+        const HINTS = {
+            service: ['Ex. Pintor profissional', 'Ex. Faço pinturas de interiores e exteriores, com acabamento cuidado. Orçamento sem compromisso.'],
+            lessons: ['Ex. Explicações de Matemática', 'Ex. Explicações para o 2.º e 3.º ciclo e secundário, com preparação para testes e exames.'],
+            resume: ['Ex. Procuro trabalho em restauração', 'Ex. Tenho experiência em atendimento ao público e estou disponível para começar de imediato.'],
+            job: ['Ex. Ajudante de cozinha', 'Ex. Restaurante em Sintra procura ajudante de cozinha para o turno do almoço. Damos formação.'],
+            donation: ['Ex. Roupa de bebé', 'Ex. Roupa dos 0 aos 12 meses, em bom estado. É só combinar a recolha.'],
+            sale: ['Ex. Bicicleta de criança', 'Ex. Bicicleta para 6 a 9 anos, pouco usada, com rodinhas.'],
+        };
+        // Three places for photos: the ones chosen (with a button to take them out), then one to add more.
         const renderPhotos = () => {
-            aForm.querySelector('.photo-picks').innerHTML = photos.map((file, i) => `<span><img src="${URL.createObjectURL(file)}" alt=""><button type="button" data-unpick="${i}" aria-label="Remover foto"><i class="fas fa-times"></i></button></span>`).join('');
-            aForm.querySelector('.photo-add').hidden = photos.length >= 3;
+            const slots = [0, 1, 2].map((i) => (photos[i]
+                ? `<span class="photo-slot"><img src="${URL.createObjectURL(photos[i])}" alt=""><button type="button" data-unpick="${i}" aria-label="Remover foto"><i class="fas fa-times"></i></button></span>`
+                : i === photos.length ? '<button type="button" class="photo-slot is-add" data-add-photo><i class="fas fa-plus"></i><span>Adicionar foto</span></button>' : '<span class="photo-slot is-empty"></span>'));
+            aForm.querySelector('.photo-slots').innerHTML = slots.join('');
         };
         const chooseCategory = async (key) => {
             const category = (await loadCategories())[key];
             if (!category) return;
             aForm.querySelector('.cat-fields').innerHTML = Object.entries(category.fields).map(([name, field]) => fieldHtml(name, field)).join('');
+            aForm.querySelectorAll('[data-after-category]').forEach((part) => { part.hidden = false; });
+            aForm.querySelector('[data-before-category]').hidden = true;
+            const [title, text] = HINTS[key] || ['', ''];
+            aForm.elements.title.placeholder = title;
+            aForm.elements.description.placeholder = text;
             aForm.querySelector('.photo-field').hidden = !category.photos;
             aForm.querySelector('.pdf-field').hidden = !category.pdf;
             aForm.querySelector('.sale-note').hidden = !category.limit;
-            if (!category.photos) { photos = []; renderPhotos(); }
+            if (!category.photos) photos = [];
+            renderPhotos();
+        };
+        // Back to the start: only the NIF and the categories.
+        const resetAnnounce = () => {
+            photos = [];
+            checkedNif = '';
+            nifState.hidden = true;
+            aForm.querySelector('.cat-fields').innerHTML = '';
+            aForm.querySelectorAll('[data-after-category], .photo-field, .pdf-field, .sale-note').forEach((part) => { part.hidden = true; });
+            aForm.querySelector('[data-before-category]').hidden = false;
+            aForm.querySelector('.file-name').textContent = 'Escolher o currículo em PDF';
+            aForm.querySelector('.count').textContent = '0 / 1000';
         };
         const openAnnounce = async (nif = '') => {
             if (!announceBox) return;
-            if (!announceBox.querySelector('.form-done').hidden) restart(announceBox);
+            if (!announceBox.querySelector('.form-done').hidden) { restart(announceBox); resetAnnounce(); }
             openBox(announceBox);
             const data = await loadCategories();
             const grid = aForm.querySelector('.cat-grid');
@@ -382,18 +411,26 @@
             } catch (e) { nifState.hidden = true; checkedNif = ''; }
         };
         aForm?.elements.member_document.addEventListener('input', checkNif);
+        // The description's length, and the mobile number written in groups (912 345 678).
+        aForm?.elements.description.addEventListener('input', (event) => { aForm.querySelector('.count').textContent = `${event.target.value.length} / 1000`; });
+        aForm?.elements.contact.addEventListener('input', (event) => {
+            const digits = event.target.value.replace(/\D/g, '');
+            if (/^9\d{0,8}$/.test(digits)) event.target.value = digits.replace(/^(\d{3})(\d{1,3})?(\d{1,3})?$/, (all, a, b, c) => [a, b, c].filter(Boolean).join(' '));
+        });
         aForm?.addEventListener('change', (event) => {
             if (event.target.name === 'type') chooseCategory(event.target.value);
-            if (event.target.closest('.photo-add')) {
+            if (event.target.classList.contains('photo-input')) {
                 photos = [...photos, ...event.target.files].slice(0, 3);
                 event.target.value = '';
                 renderPhotos();
             }
+            if (event.target.name === 'image_path') aForm.querySelector('.file-name').textContent = event.target.files[0]?.name || 'Escolher o currículo em PDF';
         });
         aForm?.addEventListener('click', (event) => {
             const unpick = event.target.closest('[data-unpick]');
             if (unpick) { photos.splice(Number(unpick.dataset.unpick), 1); renderPhotos(); }
-            if (event.target.closest('[data-again]')) { restart(announceBox); photos = []; renderPhotos(); aForm.querySelector('.cat-fields').innerHTML = ''; nifState.hidden = true; checkedNif = ''; }
+            if (event.target.closest('[data-add-photo]')) aForm.querySelector('.photo-input').click();
+            if (event.target.closest('[data-again]')) { restart(announceBox); resetAnnounce(); }
         });
         aForm?.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -404,7 +441,7 @@
             button.disabled = true;
             try {
                 const { response, answer } = await send(API + '/announcements', body);
-                if (response.ok) { done(announceBox, answer); photos = []; return; }
+                if (response.ok) { done(announceBox, answer); return; }
                 if (response.status === 422) {
                     const first = showErrors(announceBox, answer.errors);
                     first?.scrollIntoView({ block: 'center', behavior: 'smooth' });
