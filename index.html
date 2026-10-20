@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610202356">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610210013">
 </head>
 
 <body>
@@ -232,7 +232,7 @@
     </section>
 
     <!-- Announcements of the members, from the church's system (approved ones); anyone who is a member can announce -->
-    <section class="section" id="announcements" data-api="https://admin.igrejaicd.pt/api/public/announcements" data-announce="https://admin.igrejaicd.pt/announcement">
+    <section class="section" id="announcements" data-api="https://admin.igrejaicd.pt/api/public/announcements" data-announce="https://admin.igrejaicd.pt/announcement" data-member="https://admin.igrejaicd.pt/">
         <div class="wrap">
             <div class="heading reveal">
                 <img src="assets/images/logo-min.png" alt="Anúncios">
@@ -248,7 +248,10 @@
                     <h3>Tem algo para partilhar com a comunidade?</h3>
                     <p>Os membros podem anunciar os seus serviços, aulas, o seu currículo, uma oferta de emprego, uma doação ou algo para venda. O anúncio aparece aqui depois de aprovado pela equipa.</p>
                 </div>
-                <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener"><i class="fas fa-bullhorn"></i> Anunciar</a>
+                <div class="board-cta-actions">
+                    <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener" data-frame="announce"><i class="fas fa-bullhorn"></i> Anunciar</a>
+                    <a class="btn btn-light" href="https://admin.igrejaicd.pt/" target="_blank" rel="noopener" data-frame="member"><i class="fas fa-user-plus"></i> Ser membro</a>
+                </div>
             </div>
         </div>
         <!-- A member's stars or private comment about an announcement (the NIF says it is a member) -->
@@ -271,11 +274,20 @@
                 <p class="cmt-note" data-mode="comment"><i class="fas fa-lock"></i> Este comentário é <strong>privado</strong>: vai só para os administradores da igreja e não aparece no site.</p>
                 <p class="cmt-note" data-mode="rate"><i class="fas fa-info-circle"></i> Só os membros podem avaliar, uma vez por anúncio. Se avaliar de novo, a sua nota anterior é substituída.</p>
                 <p class="cmt-msg" role="status"></p>
+                <p class="cmt-join">Ainda não é membro? <button type="button" data-frame="member">Registe-se aqui</button></p>
                 <div class="cmt-actions">
                     <button type="button" class="btn btn-ghost" data-cmt-close>Fechar</button>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
                 </div>
             </form>
+        </dialog>
+        <!-- The forms of the church's system (to announce, to be a member), inside the site -->
+        <dialog class="frame" id="frame-dialog" aria-labelledby="frame-title">
+            <div class="frame-head">
+                <h3 id="frame-title"></h3>
+                <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+            </div>
+            <iframe title="" loading="lazy"></iframe>
         </dialog>
         <!-- The photos of a donation or a sale -->
         <dialog class="photo" id="photo-dialog" aria-label="Fotos do anúncio">
@@ -529,7 +541,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610202356"></script>
+    <script src="assets/js/site.js?v=202610210013"></script>
 </body>
 
 </html>

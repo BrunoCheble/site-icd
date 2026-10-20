@@ -258,6 +258,28 @@
         const form = dialog?.querySelector('form');
         const message = dialog?.querySelector('.cmt-msg');
         const gallery = document.getElementById('photo-dialog');
+        // The forms of the church's system (to announce, to be a member) open in a window of the site; their
+        // "Fechar" closes it.
+        const embedBox = document.getElementById('frame-dialog');
+        const frames = { announce: [ads.dataset.announce, 'Anunciar'], member: [ads.dataset.member, 'Ser membro'] };
+        const openFrame = (kind) => {
+            const [url, title] = frames[kind] || [];
+            if (!embedBox || !url) return false;
+            dialog?.open && dialog.close();
+            embedBox.querySelector('#frame-title').textContent = title;
+            embedBox.querySelector('iframe').title = title;
+            embedBox.querySelector('iframe').src = url + (url.includes('?') ? '&' : '?') + 'embed=1';
+            hold();
+            embedBox.showModal();
+            return true;
+        };
+        document.addEventListener('click', (event) => {
+            const opener = event.target.closest('[data-frame]');
+            if (opener && openFrame(opener.dataset.frame)) event.preventDefault();
+        });
+        window.addEventListener('message', (event) => {
+            if (event.data?.icd === 'close' && embedBox?.open && event.origin === new URL(ads.dataset.announce).origin) embedBox.close();
+        });
         let current = null;
         let mode = 'comment';
         let chosen = 0;
@@ -288,6 +310,7 @@
             form.elements.body.required = kind === 'comment';
             message.textContent = '';
             message.className = 'cmt-msg';
+            dialog.querySelector('.cmt-join').classList.remove('is-on');
             form.querySelector('[type="submit"]').disabled = false;
             pick(0);
             hold();
@@ -315,7 +338,8 @@
             if (event.key === 'ArrowLeft') showPhoto(photoAt - 1);
         });
         form?.querySelectorAll('[data-star]').forEach((star) => star.addEventListener('click', () => pick(Number(star.dataset.star))));
-        [dialog, gallery].forEach((box) => {
+        embedBox?.addEventListener('close', () => { embedBox.querySelector('iframe').src = 'about:blank'; });
+        [dialog, gallery, embedBox].forEach((box) => {
             box?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => box.close()));
             box?.addEventListener('click', (event) => { if (event.target === box) box.close(); });
             box?.addEventListener('close', () => release());
@@ -350,6 +374,8 @@
                 if (response.status === 429) return say('Foram enviados muitos pedidos seguidos. Tente de novo daqui a um minuto.');
                 const errors = Object.values(answer.errors || {}).flat();
                 say(errors[0] || 'Não foi possível enviar agora. Tente de novo mais tarde.');
+                // A NIF that is not a member's: the registration, right there.
+                if (answer.errors?.member_document) dialog.querySelector('.cmt-join').classList.add('is-on');
             } catch (e) {
                 send.disabled = false;
                 say('Não foi possível enviar agora. Verifique a ligação à internet.');
