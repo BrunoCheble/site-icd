@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610202326">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610202350">
 </head>
 
 <body>
@@ -237,7 +237,7 @@
             <div class="heading reveal">
                 <img src="assets/images/logo-min.png" alt="Anúncios">
                 <h2>Anúncios da <em>Comunidade</em></h2>
-                <p>Serviços, aulas, currículos e ofertas de emprego dos membros da igreja.</p>
+                <p>Serviços, aulas, currículos, ofertas de emprego, doações e vendas dos membros da igreja.</p>
             </div>
             <div class="board-filters" role="tablist" aria-label="Categoria de anúncio" hidden></div>
             <div class="board" aria-live="polite">
@@ -246,28 +246,44 @@
             <div class="board-cta reveal">
                 <div>
                     <h3>Tem algo para partilhar com a comunidade?</h3>
-                    <p>Os membros podem anunciar os seus serviços, aulas, o seu currículo ou uma oferta de emprego. O anúncio aparece aqui depois de aprovado pela equipa.</p>
+                    <p>Os membros podem anunciar os seus serviços, aulas, o seu currículo, uma oferta de emprego, uma doação ou algo para venda. O anúncio aparece aqui depois de aprovado pela equipa.</p>
                 </div>
                 <a class="btn btn-primary" href="https://admin.igrejaicd.pt/announcement" target="_blank" rel="noopener"><i class="fas fa-bullhorn"></i> Anunciar</a>
             </div>
         </div>
-        <!-- A member's comment about an announcement (the NIF says it is a member); shown once approved by the team -->
+        <!-- A member's stars or private comment about an announcement (the NIF says it is a member) -->
         <dialog class="cmt" id="comment-dialog" aria-labelledby="comment-title">
             <form class="cmt-box" novalidate>
                 <div class="cmt-head">
-                    <div><h3 id="comment-title">Enviar comentário</h3><p class="cmt-about"></p></div>
+                    <div><h3 id="comment-title">Comentário privado</h3><p class="cmt-about"></p></div>
                     <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
                 </div>
+                <div class="cmt-stars" data-mode="rate" role="group" aria-label="Estrelas">
+                    <button type="button" data-star="1" aria-label="1 estrela"><i class="far fa-star"></i></button>
+                    <button type="button" data-star="2" aria-label="2 estrelas"><i class="far fa-star"></i></button>
+                    <button type="button" data-star="3" aria-label="3 estrelas"><i class="far fa-star"></i></button>
+                    <button type="button" data-star="4" aria-label="4 estrelas"><i class="far fa-star"></i></button>
+                    <button type="button" data-star="5" aria-label="5 estrelas"><i class="far fa-star"></i></button>
+                </div>
                 <label class="cmt-field">NIF do membro<input name="member_document" inputmode="numeric" maxlength="9" autocomplete="off" required></label>
-                <label class="cmt-field">Comentário<textarea name="body" rows="4" maxlength="600" required placeholder="Ex. Fez um ótimo trabalho na minha casa, recomendo!"></textarea></label>
+                <label class="cmt-field" data-mode="comment">Comentário<textarea name="body" rows="4" maxlength="600" placeholder="Ex. Já não atende o telefone; o anúncio ainda está ativo?"></textarea></label>
                 <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
-                <p class="cmt-note"><i class="fas fa-info-circle"></i> Só os membros da igreja podem comentar. O comentário aparece aqui depois de aprovado pela equipa.</p>
+                <p class="cmt-note" data-mode="comment"><i class="fas fa-lock"></i> Este comentário é <strong>privado</strong>: vai só para os administradores da igreja e não aparece no site.</p>
+                <p class="cmt-note" data-mode="rate"><i class="fas fa-info-circle"></i> Só os membros podem avaliar, uma vez por anúncio. Se avaliar de novo, a sua nota anterior é substituída.</p>
                 <p class="cmt-msg" role="status"></p>
                 <div class="cmt-actions">
                     <button type="button" class="btn btn-ghost" data-cmt-close>Fechar</button>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar</button>
                 </div>
             </form>
+        </dialog>
+        <!-- The photos of a donation or a sale -->
+        <dialog class="photo" id="photo-dialog" aria-label="Fotos do anúncio">
+            <img src="" alt="">
+            <button type="button" class="photo-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+            <button type="button" class="photo-arrow is-prev" data-photo="-1" aria-label="Foto anterior"><i class="fas fa-chevron-left"></i></button>
+            <button type="button" class="photo-arrow is-next" data-photo="1" aria-label="Foto seguinte"><i class="fas fa-chevron-right"></i></button>
+            <span class="photo-count"></span>
         </dialog>
     </section>
 
@@ -513,7 +529,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610202326"></script>
+    <script src="assets/js/site.js?v=202610202350"></script>
 </body>
 
 </html>

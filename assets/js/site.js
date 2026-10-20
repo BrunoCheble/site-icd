@@ -110,21 +110,27 @@
         let loading = null;
         let all = [];
 
+        const stars = (value) => [1, 2, 3, 4, 5].map((n) => `<i class="${value >= n - .25 ? 'fas fa-star' : value >= n - .75 ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>`).join('');
         const card = (ad) => {
-            // The category's picture (the same for all of its announcements), its fields as tags, the ways to reach
-            // whoever announced, and the members' approved comments.
-            const media = `<div class="post-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="post-type">${escape(ad.type_name)}</span></div>`;
+            // The picture (the first photo of a donation or a sale, otherwise the category's), its fields as tags, the
+            // ways to reach whoever announced, the members' stars, and a private comment for the church's team.
+            const photos = ad.photos || [];
+            const media = `<div class="post-media"${photos.length ? ` data-gallery="${escape(ad.id)}" role="button" tabindex="0" aria-label="Ver fotos"` : ''}><img src="${escape(ad.image_url)}" alt="" loading="lazy">
+                <span class="post-type">${escape(ad.type_name)}</span>${photos.length > 1 ? `<span class="post-count"><i class="fas fa-images"></i> ${photos.length}</span>` : ''}</div>`;
             const tags = (ad.details || []).map((line) => `<span title="${escape(line.label)}">${escape(line.short || line.value)}</span>`).join('');
             const actions = [
                 ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
                 ad.link ? `<a class="is-link" href="${escape(safeUrl(ad.link))}" target="_blank" rel="noopener nofollow"><i class="fas fa-external-link-alt"></i> Link</a>` : '',
                 ad.pdf_url ? `<a class="is-link" href="${escape(ad.pdf_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> Currículo</a>` : '',
             ].join('');
-            const comments = ad.comments || [];
-            const talk = (comments.length
-                ? `<button type="button" class="post-talk-toggle" data-talk><i class="far fa-comment"></i> ${comments.length} ${comments.length === 1 ? 'comentário' : 'comentários'}</button>
-                   <div class="post-talk-list" hidden>${comments.map((comment) => `<blockquote><p>${escape(comment.body)}</p><cite>${escape(comment.name)} · ${escape(comment.date)}</cite></blockquote>`).join('')}</div>`
-                : '') + (ad.comments_url ? `<button type="button" class="post-comment" data-comment="${escape(ad.id)}"><i class="far fa-comment-dots"></i> Enviar comentário</button>` : '');
+            const rating = ad.rating || { count: 0 };
+            const score = rating.count
+                ? `<span class="post-stars" title="Avaliação dos membros">${stars(rating.average)} <b>${String(rating.average).replace('.', ',')}</b> <small>(${rating.count})</small></span>`
+                : '<span class="post-stars is-empty">Ainda sem avaliações</span>';
+            const talk = ad.ratings_url
+                ? `<div class="post-score">${score}<button type="button" class="post-rate" data-rate="${escape(ad.id)}"><i class="far fa-star"></i> Avaliar</button></div>
+                   <button type="button" class="post-comment" data-comment="${escape(ad.id)}"><i class="fas fa-lock"></i> Comentário privado para a equipa</button>`
+                : '';
             return `<article class="post">${media}<div class="post-body"><h3>${escape(ad.title)}</h3><p class="post-text">${escape(ad.description)}</p>
                 <button type="button" class="post-more" hidden>Ver mais</button>${tags ? `<div class="post-tags">${tags}</div>` : ''}
                 <div class="post-actions">${actions}</div><div class="post-talk">${talk}</div></div></article>`;
@@ -245,58 +251,111 @@
                 });
             return loading;
         };
-        // A card's comments open under it; "Enviar comentário" opens the form (for the copies of the endless row too).
+        // On a card (the copies of the endless row too): the photos open in a gallery; "Avaliar" and the private
+        // comment open the form, which asks for the member's NIF.
         const dialog = document.getElementById('comment-dialog');
         const form = dialog?.querySelector('form');
         const message = dialog?.querySelector('.cmt-msg');
-        let commenting = null;
-        list.addEventListener('click', (event) => {
-            const toggle = event.target.closest('[data-talk]');
-            if (toggle) {
-                const box = toggle.nextElementSibling;
-                box.hidden = !box.hidden;
-                return;
-            }
-            const button = event.target.closest('[data-comment]');
-            if (!button || !dialog) return;
-            commenting = all.find((ad) => String(ad.id) === button.dataset.comment);
-            if (!commenting) return;
-            dialog.querySelector('.cmt-about').textContent = commenting.title;
+        const gallery = document.getElementById('photo-dialog');
+        let current = null;
+        let mode = 'comment';
+        let chosen = 0;
+        let photoAt = 0;
+        const find = (id) => all.find((ad) => String(ad.id) === id);
+        const showPhoto = (n) => {
+            const photos = current.photos;
+            photoAt = (n + photos.length) % photos.length;
+            gallery.querySelector('img').src = photos[photoAt];
+            gallery.querySelector('.photo-count').textContent = photos.length > 1 ? `${photoAt + 1} / ${photos.length}` : '';
+            gallery.querySelectorAll('[data-photo]').forEach((arrow) => { arrow.hidden = photos.length < 2; });
+        };
+        const pick = (n) => {
+            chosen = n;
+            form.querySelectorAll('[data-star]').forEach((star) => {
+                const on = Number(star.dataset.star) <= n;
+                star.classList.toggle('is-on', on);
+                star.setAttribute('aria-pressed', String(Number(star.dataset.star) === n));
+                star.querySelector('i').className = on ? 'fas fa-star' : 'far fa-star';
+            });
+        };
+        const openForm = (ad, kind) => {
+            current = ad;
+            mode = kind;
+            dialog.querySelector('#comment-title').textContent = kind === 'rate' ? 'Avaliar' : 'Comentário privado';
+            dialog.querySelector('.cmt-about').textContent = ad.title;
+            dialog.querySelectorAll('[data-mode]').forEach((part) => { part.hidden = part.dataset.mode !== kind; });
+            form.elements.body.required = kind === 'comment';
             message.textContent = '';
             message.className = 'cmt-msg';
             form.querySelector('[type="submit"]').disabled = false;
+            pick(0);
             hold();
             dialog.showModal();
             form.elements.member_document.focus();
+        };
+        const openGallery = (ad) => {
+            if (!gallery || !(ad?.photos || []).length) return;
+            current = ad;
+            showPhoto(0);
+            hold();
+            gallery.showModal();
+        };
+        list.addEventListener('click', (event) => {
+            const media = event.target.closest('[data-gallery]');
+            if (media) return openGallery(find(media.dataset.gallery));
+            const rate = event.target.closest('[data-rate]');
+            const comment = event.target.closest('[data-comment]');
+            const ad = find((rate || comment)?.dataset.rate || (rate || comment)?.dataset.comment);
+            if (ad && dialog) openForm(ad, rate ? 'rate' : 'comment');
         });
-        dialog?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => dialog.close()));
-        dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
-        dialog?.addEventListener('close', () => release());
+        list.addEventListener('keydown', (event) => {
+            const media = event.target.closest('[data-gallery]');
+            if (media && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); openGallery(find(media.dataset.gallery)); }
+        });
+        gallery?.querySelectorAll('[data-photo]').forEach((arrow) => arrow.addEventListener('click', () => showPhoto(photoAt + Number(arrow.dataset.photo))));
+        gallery?.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') showPhoto(photoAt + 1);
+            if (event.key === 'ArrowLeft') showPhoto(photoAt - 1);
+        });
+        form?.querySelectorAll('[data-star]').forEach((star) => star.addEventListener('click', () => pick(Number(star.dataset.star))));
+        [dialog, gallery].forEach((box) => {
+            box?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => box.close()));
+            box?.addEventListener('click', (event) => { if (event.target === box) box.close(); });
+            box?.addEventListener('close', () => release());
+        });
         form?.addEventListener('submit', async (event) => {
             event.preventDefault();
-            if (!commenting) return;
+            if (!current) return;
             const send = form.querySelector('[type="submit"]');
             const say = (text, ok) => { message.textContent = text; message.className = 'cmt-msg ' + (ok ? 'is-ok' : 'is-error'); };
+            if (mode === 'rate' && !chosen) return say('Escolha de 1 a 5 estrelas.');
             send.disabled = true;
+            const fields = { member_document: form.elements.member_document.value, website: form.elements.website.value };
             try {
-                const response = await fetch(commenting.comments_url, {
+                const response = await fetch(mode === 'rate' ? current.ratings_url : current.comments_url, {
                     method: 'POST',
                     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ member_document: form.elements.member_document.value, body: form.elements.body.value, website: form.elements.website.value }),
+                    body: JSON.stringify(mode === 'rate' ? { ...fields, stars: chosen } : { ...fields, body: form.elements.body.value }),
                 });
                 const answer = await response.json().catch(() => ({}));
                 if (response.ok) {
-                    say(answer.message || 'Obrigado! O seu comentário aparece no site depois de aprovado.', true);
+                    say(answer.message || 'Obrigado!', true);
                     form.elements.body.value = '';
+                    // The new average, on the card right away (and in this browser's copy on the next visit).
+                    if (mode === 'rate' && answer.rating) {
+                        current.rating = answer.rating;
+                        try { localStorage.removeItem(KEY); } catch (e) { /* not kept */ }
+                        render(filters.querySelector('.is-active')?.dataset.type || '');
+                    }
                     return;
                 }
                 send.disabled = false;
-                if (response.status === 429) return say('Foram enviados muitos comentários seguidos. Tente de novo daqui a um minuto.');
+                if (response.status === 429) return say('Foram enviados muitos pedidos seguidos. Tente de novo daqui a um minuto.');
                 const errors = Object.values(answer.errors || {}).flat();
-                say(errors[0] || 'Não foi possível enviar o comentário agora. Tente de novo mais tarde.');
+                say(errors[0] || 'Não foi possível enviar agora. Tente de novo mais tarde.');
             } catch (e) {
                 send.disabled = false;
-                say('Não foi possível enviar o comentário agora. Verifique a ligação à internet.');
+                say('Não foi possível enviar agora. Verifique a ligação à internet.');
             }
         });
 
