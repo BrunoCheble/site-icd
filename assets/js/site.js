@@ -100,7 +100,7 @@
     // the same time, and kept in this browser for 10 minutes (the system caches them too).
     const ads = document.getElementById('announcements');
     if (ads) {
-        const KEY = 'icd-announcements';
+        const KEY = 'icd-announcements-v2';
         const KEEP = 10 * 60 * 1000;
         const list = ads.querySelector('.ads');
         const filters = ads.querySelector('.ads-filters');
@@ -112,13 +112,14 @@
         let all = [];
 
         const card = (ad) => {
-            const media = ad.image_url && !ad.is_pdf
+            // Every announcement has a picture in the same format (the system gives the default one when none was sent).
+            const media = ad.image_url
                 ? `<div class="ad-media"><img src="${escape(ad.image_url)}" alt="" loading="lazy"><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`
-                : `<div class="ad-media is-plain"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
+                : `<div class="ad-media"><i class="fas ${icons[ad.type] || 'fa-bullhorn'}"></i><span class="ad-type">${escape(names[ad.type] || ad.type_name)}</span></div>`;
             const actions = [
                 ad.whatsapp ? `<a class="is-whatsapp" href="${escape(ad.whatsapp)}" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '',
                 ad.link ? `<a class="is-link" href="${escape(safeUrl(ad.link))}" target="_blank" rel="noopener nofollow"><i class="fas fa-external-link-alt"></i> Link</a>` : '',
-                ad.image_url && ad.is_pdf ? `<a class="is-link" href="${escape(ad.image_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PDF</a>` : '',
+                ad.pdf_url ? `<a class="is-link" href="${escape(ad.pdf_url)}" target="_blank" rel="noopener"><i class="fas fa-file-pdf"></i> PDF</a>` : '',
             ].join('');
             return `<article class="ad">${media}<div class="ad-body"><h3>${escape(ad.title)}</h3><p class="ad-text">${escape(ad.description)}</p>
                 <button type="button" class="ad-more" hidden>Ver mais</button><div class="ad-actions">${actions}</div></div></article>`;
