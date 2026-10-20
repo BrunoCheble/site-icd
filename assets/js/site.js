@@ -96,12 +96,13 @@
     });
     window.addEventListener('popstate', () => document.querySelectorAll('.dlg[open]').forEach((dialog) => dialog.close()));
 
-    // Members' announcements, from the church's system. Asked once, only when the section comes near, never twice at
-    // the same time, and kept in this browser for 10 minutes (the system caches them too).
+    // Members' announcements, from the church's system. Asked once per visit, only when the section comes near: the
+    // copy kept in this browser shows at once and the current list replaces it when it changed (an approval shows on
+    // the next visit). Not asked again within a minute (the system caches them too).
     const ads = document.getElementById('announcements');
     if (ads) {
-        const KEY = 'icd-announcements-v2';
-        const KEEP = 10 * 60 * 1000;
+        const KEY = 'icd-announcements-v3';
+        const FRESH = 60 * 1000;
         const list = ads.querySelector('.ads');
         const filters = ads.querySelector('.ads-filters');
         const icons = { resume: 'fa-file-alt', service: 'fa-tools', donation: 'fa-hand-holding-heart', product: 'fa-tag' };
@@ -224,17 +225,19 @@
         };
         const load = () => {
             if (loading) return loading;
-            try {
-                const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
-                if (saved && Date.now() - saved.at < KEEP) { show(saved.data); return (loading = Promise.resolve()); }
-            } catch (e) { /* no storage here: asked to the system */ }
-            loading = fetch(ads.dataset.api, { headers: { Accept: 'application/json' } })
+            let saved = null;
+            try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { /* no storage here */ }
+            if (saved) show(saved.data);
+            if (saved && Date.now() - saved.at < FRESH) return (loading = Promise.resolve());
+            loading = fetch(ads.dataset.api, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
                 .then((response) => { if (!response.ok) throw new Error(response.status); return response.json(); })
                 .then(({ data }) => {
                     try { localStorage.setItem(KEY, JSON.stringify({ at: Date.now(), data })); } catch (e) { /* not kept */ }
-                    show(data);
+                    if (!saved || JSON.stringify(saved.data) !== JSON.stringify(data)) show(data);
                 })
-                .catch(() => { list.innerHTML = '<div class="ads-empty"><i class="fas fa-wifi"></i>Não foi possível carregar os anúncios agora.</div>'; });
+                .catch(() => {
+                    if (!saved) list.innerHTML = '<div class="ads-empty"><i class="fas fa-wifi"></i>Não foi possível carregar os anúncios agora.</div>';
+                });
             return loading;
         };
         const near = new IntersectionObserver((entries) => {
