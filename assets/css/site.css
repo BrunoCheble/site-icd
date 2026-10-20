@@ -162,39 +162,77 @@ p { margin: 0; }
 .footer-social a:hover { background: var(--brand); }
 @media (max-width: 640px) { .footer-inner { flex-direction: column; text-align: center; } }
 
-/* The ministries' pages and the biography: a window over the site (a sheet from the bottom on phones) */
-.dlg { width: min(46rem, calc(100% - 2rem)); max-height: min(88vh, 60rem); padding: 0; border: 0; border-radius: 1.5rem; box-shadow: 0 30px 80px rgba(0, 0, 0, .35); color: var(--text); }
-.dlg::backdrop { background: rgba(15, 23, 42, .6); backdrop-filter: blur(4px); }
-.dlg[open] { animation: rise .25s ease-out; }
-@keyframes rise { from { opacity: 0; transform: translateY(16px); } }
-.dlg-box { display: flex; flex-direction: column; max-height: inherit; }
-.dlg-head { position: sticky; top: 0; display: flex; align-items: center; gap: 1rem; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--line); background: #fff; }
-.dlg-head h3 { flex: 1; font-size: 1.3rem; font-weight: 800; }
-.dlg-x { width: 40px; height: 40px; border: 0; border-radius: 999px; background: var(--soft); color: var(--ink); cursor: pointer; }
-.dlg-body { flex: 1; min-height: 0; overflow-y: auto; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: .75rem; }
-/* The sections keep their whole height: the window scrolls, they do not shrink */
-.dlg-body > * { flex-shrink: 0; }
-.dlg-foot { display: flex; justify-content: flex-end; padding: .9rem 1.5rem; border-top: 1px solid var(--line); background: #fff; }
-.dlg-intro h4 { margin-top: .5rem; font-size: 1.05rem; font-weight: 800; color: var(--ink); }
-.dlg-intro p { color: var(--muted); text-align: justify; }
-.dlg-section { border: 1px solid var(--line); border-radius: 1rem; background: #fff; overflow: hidden; }
-.dlg-section summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.15rem; font-weight: 800; color: var(--ink); cursor: pointer; list-style: none; }
-.dlg-section summary::-webkit-details-marker { display: none; }
-.dlg-section summary::after { content: '\f078'; font-family: 'Font Awesome 5 Free'; font-weight: 900; font-size: .8rem; color: var(--brand-dark); transition: transform .2s; }
-.dlg-section[open] summary { background: var(--brand-soft); }
-.dlg-section[open] summary::after { transform: rotate(180deg); }
-.dlg-text { padding: 1rem 1.15rem 1.15rem; font-size: .95rem; }
-.dlg-text p { margin: 0 0 .75rem; text-align: justify; }
+/* The ministries' pages and the biography: a window over the site (a sheet from the bottom on phones), with its
+   header, an index of its sections (beside on large screens, as chips on top on phones) and the sections in turn */
+.dlg { width: min(64rem, calc(100% - 2rem)); height: min(88vh, 54rem); max-height: none; padding: 0; border: 0; border-radius: 1.75rem; box-shadow: 0 40px 100px rgba(0, 0, 0, .4); color: var(--text); overflow: hidden; }
+.dlg::backdrop { background: rgba(15, 23, 42, .65); backdrop-filter: blur(6px); }
+.dlg[open] { animation: rise .3s cubic-bezier(.2, .8, .2, 1); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px) scale(.98); } }
+.dlg-box { display: flex; flex-direction: column; height: 100%; }
+
+.dlg-head { position: relative; display: flex; align-items: center; gap: 1rem; padding: 1.5rem 1.75rem; color: #fff; background: radial-gradient(ellipse at top left, #fbbf24, var(--brand) 35%, #b45309); overflow: hidden; }
+.dlg-head::after { content: ''; position: absolute; right: -4rem; top: -4rem; width: 14rem; height: 14rem; border-radius: 50%; background: rgba(255, 255, 255, .12); }
+.dlg-icon { position: relative; z-index: 1; flex: none; width: 3.5rem; height: 3.5rem; display: grid; place-items: center; border-radius: 1.1rem; background: rgba(255, 255, 255, .2); border: 1px solid rgba(255, 255, 255, .35); font-size: 1.45rem; }
+.dlg-titles { position: relative; z-index: 1; flex: 1; min-width: 0; }
+.dlg-titles span { font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+.dlg-titles h3 { color: #fff; font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 800; letter-spacing: -.01em; }
+.dlg-x { position: relative; z-index: 1; flex: none; width: 44px; height: 44px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .2); color: #fff; font-size: 1.05rem; cursor: pointer; transition: background .15s; }
+.dlg-x:hover { background: rgba(255, 255, 255, .32); }
+
+.dlg-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); }
+.dlg-toc { overflow-y: auto; padding: 1.25rem .75rem; border-right: 1px solid var(--line); background: var(--soft); display: flex; flex-direction: column; gap: .2rem; }
+.dlg-toc:empty { display: none; }
+.dlg-toc a { position: relative; padding: .6rem .85rem; border-radius: .75rem; color: var(--muted); font-size: .86rem; font-weight: 600; line-height: 1.35; text-decoration: none; transition: background .15s, color .15s; }
+.dlg-toc a:hover { background: #fff; color: var(--ink); }
+.dlg-toc a.is-current { background: #fff; color: var(--brand-dark); box-shadow: 0 1px 3px rgba(15, 23, 42, .08); }
+.dlg-toc a.is-current::before { content: ''; position: absolute; left: 0; top: 25%; bottom: 25%; width: 3px; border-radius: 3px; background: var(--brand); }
+.dlg-main:has(.dlg-toc:empty) { grid-template-columns: minmax(0, 1fr); }
+
+.dlg-body { min-height: 0; overflow-y: auto; padding: 1.75rem clamp(1.25rem, 3vw, 2.5rem) 2.5rem; scroll-behavior: smooth; }
+.dlg-intro { max-width: 46rem; margin-bottom: 1.25rem; }
+.dlg-intro h4 { margin: .75rem 0 .35rem; font-size: 1.15rem; font-weight: 800; color: var(--ink); }
+.dlg-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--text); text-align: left; }
+.dlg-intro hr { border: 0; border-top: 1px solid var(--line); margin: 1.5rem 0; }
+.dlg-part { max-width: 46rem; padding: 1.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.dlg-part:first-of-type { border-top: 0; padding-top: .25rem; }
+.dlg-part h4 { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .9rem; font-size: 1.2rem; font-weight: 800; color: var(--ink); }
+.dlg-part h4::before { content: ''; flex: none; width: .55rem; height: .55rem; border-radius: 50%; background: var(--brand); transform: translateY(-.15rem); }
+.dlg-text { font-size: 1rem; line-height: 1.7; }
+.dlg-text p { margin: 0 0 .85rem; }
 .dlg-text p:last-child { margin-bottom: 0; }
-.dlg-text ul, .dlg-text ol { margin: .25rem 0 .75rem; padding-left: 1.25rem; }
-.dlg-text li { margin: .35rem 0; }
-.dlg-text li::marker { color: var(--brand); }
+.dlg-text ul, .dlg-text ol { margin: .25rem 0 .9rem; padding: 0; list-style: none; display: grid; gap: .55rem; }
+.dlg-text > ul > li, .dlg-text > ol > li { position: relative; padding: .7rem .9rem .7rem 2.4rem; border-radius: .9rem; background: var(--soft); }
+.dlg-text > ul > li::before, .dlg-text > ol > li::before { content: '\f00c'; position: absolute; left: .85rem; top: .85rem; font-family: 'Font Awesome 5 Free'; font-weight: 900; font-size: .75rem; color: var(--brand-dark); }
+.dlg-text li ul { margin: .5rem 0 0; gap: .3rem; }
+.dlg-text li li { position: relative; padding-left: 1rem; }
+.dlg-text li li::before { content: ''; position: absolute; left: 0; top: .7em; width: .35rem; height: .35rem; border-radius: 50%; background: var(--brand); }
 .dlg-text strong { color: var(--ink); }
-.dlg-text a { color: var(--brand-dark); }
-.dlg-text hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; }
-@media (max-width: 640px) {
-    .dlg { width: 100%; max-width: 100%; max-height: 92vh; margin: auto 0 0; border-radius: 1.5rem 1.5rem 0 0; }
-    .dlg-head, .dlg-body, .dlg-foot { padding-left: 1.1rem; padding-right: 1.1rem; }
+.dlg-text a { color: var(--brand-dark); font-weight: 600; }
+.dlg-text hr { border: 0; border-top: 1px solid var(--line); margin: 1.25rem 0; }
+
+.dlg-foot { display: flex; align-items: center; gap: .5rem; padding: .85rem 1.5rem; border-top: 1px solid var(--line); background: #fff; }
+.dlg-step { display: inline-flex; align-items: center; gap: .5rem; max-width: 40%; min-height: 44px; padding: 0 1rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-size: .88rem; font-weight: 700; cursor: pointer; }
+.dlg-step span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dlg-step:hover { border-color: var(--brand); color: var(--brand-dark); }
+.dlg-step.is-next { margin-left: auto; }
+.dlg-close { margin-left: auto; }
+.dlg-step.is-next + .dlg-close { margin-left: 0; }
+
+@media (max-width: 760px) {
+    .dlg { width: 100%; max-width: 100%; height: 94vh; margin: auto 0 0; border-radius: 1.5rem 1.5rem 0 0; }
+    .dlg-head { padding: 1.1rem 1.1rem 1rem; }
+    .dlg-icon { width: 3rem; height: 3rem; font-size: 1.2rem; }
+    .dlg-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .dlg-toc { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: .6rem .75rem; border-right: 0; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+    .dlg-toc::-webkit-scrollbar { display: none; }
+    .dlg-toc a { flex: none; max-width: 15rem; padding: .45rem .8rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dlg-toc a.is-current { border-color: var(--brand); background: var(--brand-soft); box-shadow: none; }
+    .dlg-toc a.is-current::before { display: none; }
+    .dlg-body { padding: 1.25rem 1.1rem 2rem; }
+    .dlg-foot { padding: .7rem 1rem max(.7rem, env(safe-area-inset-bottom)); }
+    .dlg-step { padding: 0 .85rem; }
+    .dlg-step span { display: none; }
+    .dlg-close { flex: 1; }
 }
 body.has-dialog { overflow: hidden; }
 

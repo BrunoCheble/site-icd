@@ -51,28 +51,48 @@
     show(0);
 
     // The ministries' pages and the biography; the phone's back button closes them.
-    const open = (id) => {
+    const open = (id, replace = false) => {
         const dialog = document.getElementById(id);
         if (!dialog) return;
+        document.querySelectorAll('.dlg[open]').forEach((other) => other.close());
         dialog.showModal();
         dialog.querySelector('.dlg-body').scrollTop = 0;
+        markSection(dialog);
         document.body.classList.add('has-dialog');
-        history.pushState({ dialog: id }, '');
+        if (replace) history.replaceState({ dialog: id }, '');
+        else history.pushState({ dialog: id }, '');
+    };
+    // The section being read, marked in the window's index.
+    const markSection = (dialog) => {
+        const body = dialog.querySelector('.dlg-body');
+        const parts = [...body.querySelectorAll('.dlg-part')];
+        const top = body.getBoundingClientRect().top + 80;
+        const atEnd = body.scrollTop + body.clientHeight >= body.scrollHeight - 4;
+        const here = atEnd ? parts.at(-1) : parts.filter((part) => part.getBoundingClientRect().top <= top).at(-1) || parts[0];
+        dialog.querySelectorAll('.dlg-toc a').forEach((link) => {
+            const on = here && link.dataset.goto === here.id;
+            link.classList.toggle('is-current', on);
+            if (on) link.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        });
     };
     document.addEventListener('click', (event) => {
         const opener = event.target.closest('[data-open]');
         if (opener) open(opener.dataset.open);
+        const next = event.target.closest('[data-switch]');
+        if (next) open(next.dataset.switch, true);
+        const goto = event.target.closest('[data-goto]');
+        if (goto) {
+            event.preventDefault();
+            document.getElementById(goto.dataset.goto)?.scrollIntoView({ block: 'start' });
+        }
         if (event.target.closest('[data-close]')) history.back();
     });
     document.querySelectorAll('.dlg').forEach((dialog) => {
-        dialog.addEventListener('close', () => document.body.classList.remove('has-dialog'));
+        dialog.addEventListener('close', () => { if (!document.querySelector('.dlg[open]')) document.body.classList.remove('has-dialog'); });
         // A click outside the window closes it.
         dialog.addEventListener('click', (event) => { if (event.target === dialog) history.back(); });
         dialog.addEventListener('cancel', (event) => { event.preventDefault(); history.back(); });
-        // One section open at a time.
-        dialog.querySelectorAll('details').forEach((details) => details.addEventListener('toggle', () => {
-            if (details.open) dialog.querySelectorAll('details[open]').forEach((other) => { if (other !== details) other.open = false; });
-        }));
+        dialog.querySelector('.dlg-body').addEventListener('scroll', () => markSection(dialog), { passive: true });
     });
     window.addEventListener('popstate', () => document.querySelectorAll('.dlg[open]').forEach((dialog) => dialog.close()));
 
