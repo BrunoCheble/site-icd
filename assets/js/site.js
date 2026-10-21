@@ -532,6 +532,14 @@
         // ---- A prayer request: anyone; the name and mobile number can be remembered on this device ----
         const pForm = prayerBox?.querySelector('form');
         const PRAYER_KEY = 'icd-prayer-me';
+        // A random code kept in this browser: the system counts the requests of the day by it (no personal data).
+        const deviceId = () => {
+            try {
+                let id = localStorage.getItem('icd-device');
+                if (!id) { id = crypto.randomUUID(); localStorage.setItem('icd-device', id); }
+                return id;
+            } catch (e) { return ''; }
+        };
         const hasTopic = (text, topic) => text.startsWith(topic + ':') || text.includes('\n' + topic + ':');
         const markTopics = () => {
             const text = pForm.elements.request.value;
@@ -575,7 +583,7 @@
             const value = (name) => pForm.elements[name].value;
             button.disabled = true;
             try {
-                const { response, answer } = await send(API + '/prayers', { name: value('name'), request: value('request'), phone_number: value('phone_number'), website: value('website') });
+                const { response, answer } = await send(API + '/prayers', { name: value('name'), request: value('request'), phone_number: value('phone_number'), website: value('website'), device: deviceId() });
                 if (response.ok) {
                     try {
                         if (pForm.elements.remember.checked) localStorage.setItem(PRAYER_KEY, JSON.stringify({ name: value('name'), phone: value('phone_number') }));
