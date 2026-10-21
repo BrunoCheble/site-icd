@@ -751,7 +751,7 @@
             const button = event.target.closest('[data-bio]');
             if (button) showBio(Number(button.dataset.bio));
         });
-        fetch(pastorsSection.dataset.api, { headers: { Accept: 'application/json' } })
+        fetch(pastorsSection.dataset.api, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
             .then((response) => (response.ok ? response.json() : Promise.reject(response)))
             .then(({ data }) => {
                 if (!Array.isArray(data) || !data.length) return;
