@@ -420,3 +420,8 @@ body.has-dialog { overflow: hidden; }
 .topics button.is-on { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
 .remember { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--muted); cursor: pointer; }
 .remember input { width: 1.05rem; height: 1.05rem; accent-color: var(--brand); }
+
+/* The forms keep their natural height: a short form does not stretch its rows (nor its fields) to fill the window */
+.cmt-box, .cmt-field, .form-dlg .form-body, .form-dlg .step, .form-part, .form-row, .cat-fields { align-content: start; }
+.cmt-field > input, .cmt-field > select { height: auto; }
+@media (max-width: 640px) { .hide-sm { display: none; } }
