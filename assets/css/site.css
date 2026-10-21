@@ -412,3 +412,22 @@ body.has-dialog { overflow: hidden; }
     .form-row, .form-row.is-wide, .cat-fields { grid-template-columns: 1fr; }
     .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* The start of the site: a prayer request and the announcements, at hand */
+.hero-quick { display: grid; grid-template-columns: repeat(2, minmax(0, 17rem)); justify-content: center; gap: .75rem; margin-top: 2rem; }
+.quick-card { display: flex; align-items: center; gap: .85rem; padding: .9rem 1.1rem; border: 1px solid rgba(255, 255, 255, .25); border-radius: 1.1rem; background: rgba(255, 255, 255, .12); backdrop-filter: blur(8px); color: #fff; font: inherit; text-align: left; text-decoration: none; cursor: pointer; transition: transform .15s, background .15s; }
+.quick-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .2); }
+.quick-card > i { display: grid; place-items: center; flex: none; width: 2.8rem; height: 2.8rem; border-radius: .9rem; background: rgba(255, 255, 255, .18); font-size: 1.2rem; }
+.quick-card strong { display: block; font-size: 1.05rem; }
+.quick-card small { display: block; margin-top: .1rem; font-size: .8rem; opacity: .85; }
+.quick-card.is-prayer { border-color: transparent; background: var(--brand); color: #fff; box-shadow: 0 10px 30px rgba(248, 169, 37, .35); }
+.quick-card.is-prayer:hover { background: var(--brand-dark); }
+.topics { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .2rem; }
+.topics button { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .75rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--muted); font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; }
+.topics button i { color: var(--brand); }
+.topics button.is-on { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-dark); }
+.remember { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--muted); cursor: pointer; }
+.remember input { width: 1.05rem; height: 1.05rem; accent-color: var(--brand); }
+@media (max-width: 640px) {
+    .hero-quick { grid-template-columns: minmax(0, 1fr); width: 100%; }
+}

@@ -37,7 +37,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610210037">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610210123">
 </head>
 
 <body>
@@ -71,6 +71,11 @@
             <div class="hero-times">
                 <span><i class="far fa-clock"></i> <strong>Domingo:</strong> 10:30 – Culto da Família</span>
                 <span><i class="far fa-clock"></i> <strong>Quinta-feira:</strong> 20:00 – Culto "Ver e Viver o Extraordinário de Deus"</span>
+            </div>
+            <!-- At hand from the start: a prayer request (anyone) and the members' announcements -->
+            <div class="hero-quick">
+                <button type="button" class="quick-card is-prayer" data-form="prayer"><i class="fas fa-praying-hands"></i><span><strong>Pedir oração</strong><small>Deixe o seu pedido, vamos orar por si</small></span></button>
+                <a href="#announcements" class="quick-card"><i class="fas fa-bullhorn"></i><span><strong>Anúncios</strong><small>Serviços, aulas, trabalho e mais</small></span></a>
             </div>
             <div class="hero-actions">
                 <a href="#schedule" class="btn btn-primary">Horários</a>
@@ -387,6 +392,45 @@
                 </div>
             </form>
         </dialog>
+        <!-- A prayer request: anyone, no need to be a member; the church's team receives it -->
+        <dialog class="cmt form-dlg" id="prayer-dialog" aria-labelledby="prayer-title">
+            <form class="cmt-box" novalidate>
+                <div class="cmt-head">
+                    <div><h3 id="prayer-title">Pedir oração</h3><p class="cmt-about">"Não andem ansiosos por coisa alguma, mas em tudo, pela oração e súplicas, apresentem os vossos pedidos a Deus." — Filipenses 4:6</p></div>
+                    <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="form-body">
+                    <label class="cmt-field" data-error-for="name"><span class="lbl">O seu nome</span><input name="name" autocomplete="name" maxlength="255" required></label>
+                    <div class="cmt-field" data-error-for="request">
+                        <span class="lbl">O seu pedido <small class="count">0 / 2000</small></span>
+                        <div class="topics" role="group" aria-label="Temas">
+                            <button type="button" data-topic="Saúde"><i class="fas fa-heartbeat"></i> Saúde</button>
+                            <button type="button" data-topic="Família"><i class="fas fa-home"></i> Família</button>
+                            <button type="button" data-topic="Trabalho"><i class="fas fa-briefcase"></i> Trabalho</button>
+                            <button type="button" data-topic="Gratidão"><i class="fas fa-praying-hands"></i> Gratidão</button>
+                            <button type="button" data-topic="Direção"><i class="fas fa-route"></i> Direção</button>
+                            <button type="button" data-topic="Paz"><i class="fas fa-dove"></i> Paz</button>
+                        </div>
+                        <textarea name="request" rows="5" maxlength="2000" placeholder="Pelo que gostaria que orássemos?"></textarea>
+                    </div>
+                    <label class="cmt-field" data-error-for="phone_number"><span class="lbl">Telemóvel <em>(opcional)</em></span><input name="phone_number" type="tel" inputmode="tel" autocomplete="tel" placeholder="912 345 678"><small>Só se quiser que a igreja fale consigo.</small></label>
+                    <label class="remember"><input type="checkbox" name="remember"> Lembrar o meu nome e telemóvel neste dispositivo</label>
+                    <p class="cmt-note"><i class="fas fa-info-circle"></i> Não é preciso ser membro. O seu nome e o pedido podem ser lidos no momento de oração da igreja; o telemóvel só é visto pela equipa.</p>
+                    <div class="cmt-hp" aria-hidden="true"><input name="website" tabindex="-1" autocomplete="off"></div>
+                    <p class="cmt-msg" role="status"></p>
+                </div>
+                <div class="cmt-actions">
+                    <button type="button" class="btn btn-ghost" data-cmt-close>Cancelar</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Enviar pedido</button>
+                </div>
+                <div class="form-done" hidden>
+                    <div class="done-icon"><i class="fas fa-praying-hands"></i></div>
+                    <h3></h3><p class="done-text"></p>
+                    <p class="done-note">"A oração de um justo é poderosa e eficaz." — Tiago 5:16</p>
+                    <div class="cmt-actions"><button type="button" class="btn btn-ghost" data-again>Enviar outro pedido</button><button type="button" class="btn btn-primary" data-cmt-close>Fechar</button></div>
+                </div>
+            </form>
+        </dialog>
         <!-- The photos of a donation or a sale -->
         <dialog class="photo" id="photo-dialog" aria-label="Fotos do anúncio">
             <img src="" alt="">
@@ -639,7 +683,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610210037"></script>
+    <script src="assets/js/site.js?v=202610210123"></script>
 </body>
 
 </html>

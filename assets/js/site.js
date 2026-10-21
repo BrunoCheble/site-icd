@@ -262,6 +262,7 @@
         // both wait for the team). Errors show under their fields.
         const API = new URL(ads.dataset.api).origin + '/api/public';
         const announceBox = document.getElementById('announce-dialog');
+        const prayerBox = document.getElementById('prayer-dialog');
         const memberBox = document.getElementById('member-dialog');
         const ICONS = { service: 'fa-tools', lessons: 'fa-graduation-cap', resume: 'fa-file-alt', job: 'fa-briefcase', donation: 'fa-hand-holding-heart', sale: 'fa-tag' };
         const send = async (url, body) => {
@@ -302,7 +303,7 @@
                 : 'Não foi possível enviar agora. Verifique a ligação à internet e tente de novo.';
         };
         const openBox = (box) => {
-            [dialog, announceBox, memberBox].forEach((other) => other !== box && other?.open && other.close());
+            [dialog, announceBox, memberBox, prayerBox].forEach((other) => other !== box && other?.open && other.close());
             hold();
             if (!box.open) box.showModal();
         };
@@ -314,7 +315,7 @@
             panel.querySelector('h3').textContent = answer.title || 'Obrigado!';
             panel.querySelector('.done-text').textContent = answer.message || '';
             const note = panel.querySelector('.done-note');
-            if (note) note.textContent = answer.note || '';
+            if (note && 'note' in answer) note.textContent = answer.note || '';
             panel.hidden = false;
         };
         const restart = (box) => {
@@ -528,13 +529,76 @@
             finally { button.disabled = false; }
         });
 
-        // The buttons that open them ("Anunciar", "Ser membro", the offers after a NIF that is not a member's).
+        // ---- A prayer request: anyone; the name and mobile number can be remembered on this device ----
+        const pForm = prayerBox?.querySelector('form');
+        const PRAYER_KEY = 'icd-prayer-me';
+        const hasTopic = (text, topic) => text.startsWith(topic + ':') || text.includes('\n' + topic + ':');
+        const markTopics = () => {
+            const text = pForm.elements.request.value;
+            pForm.querySelectorAll('[data-topic]').forEach((button) => button.classList.toggle('is-on', hasTopic(text, button.dataset.topic)));
+            pForm.querySelector('.count').textContent = `${text.length} / 2000`;
+        };
+        const fillRemembered = () => {
+            let me = null;
+            try { me = JSON.parse(localStorage.getItem(PRAYER_KEY) || 'null'); } catch (e) { /* not kept */ }
+            if (!me) return;
+            pForm.elements.name.value = me.name || '';
+            pForm.elements.phone_number.value = me.phone || '';
+            pForm.elements.remember.checked = true;
+        };
+        const openPrayer = () => {
+            if (!prayerBox) return;
+            if (!prayerBox.querySelector('.form-done').hidden) restart(prayerBox);
+            fillRemembered();
+            markTopics();
+            openBox(prayerBox);
+            (pForm.elements.name.value ? pForm.elements.request : pForm.elements.name).focus();
+        };
+        // A topic starts a line of the request ("Saúde: …"); tapping it again takes the line out.
+        pForm?.addEventListener('click', (event) => {
+            const topic = event.target.closest('[data-topic]')?.dataset.topic;
+            const area = pForm.elements.request;
+            if (topic) {
+                area.value = hasTopic(area.value, topic)
+                    ? area.value.split('\n').filter((line) => !line.startsWith(topic + ':')).join('\n').trim()
+                    : (area.value.trim() ? area.value.trim() + '\n' : '') + topic + ': ';
+                markTopics();
+                area.focus();
+                area.setSelectionRange(area.value.length, area.value.length);
+            }
+            if (event.target.closest('[data-again]')) { restart(prayerBox); fillRemembered(); markTopics(); }
+        });
+        pForm?.elements.request.addEventListener('input', markTopics);
+        pForm?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = pForm.querySelector('[type="submit"]');
+            const value = (name) => pForm.elements[name].value;
+            button.disabled = true;
+            try {
+                const { response, answer } = await send(API + '/prayers', { name: value('name'), request: value('request'), phone_number: value('phone_number'), website: value('website') });
+                if (response.ok) {
+                    try {
+                        if (pForm.elements.remember.checked) localStorage.setItem(PRAYER_KEY, JSON.stringify({ name: value('name'), phone: value('phone_number') }));
+                        else localStorage.removeItem(PRAYER_KEY);
+                    } catch (e) { /* not kept */ }
+                    done(prayerBox, answer);
+                    return;
+                }
+                if (response.status === 422) showErrors(prayerBox, answer.errors)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                else failed(prayerBox, response);
+            } catch (e) { failed(prayerBox); }
+            finally { button.disabled = false; }
+        });
+
+        // The buttons that open them ("Anunciar", "Ser membro", "Pedir oração", the offers after a NIF that is not a member's).
         document.addEventListener('click', (event) => {
             const opener = event.target.closest('[data-form]');
             if (!opener || !announceBox || !memberBox) return;
             event.preventDefault();
             const nif = (opener.closest('form')?.elements.member_document?.value || '').replace(/\D/g, '');
-            if (opener.dataset.form === 'member') openMember(nif); else openAnnounce();
+            if (opener.dataset.form === 'member') openMember(nif);
+            else if (opener.dataset.form === 'prayer') openPrayer();
+            else openAnnounce();
         });
         let current = null;
         let mode = 'comment';
@@ -594,7 +658,7 @@
             if (event.key === 'ArrowLeft') showPhoto(photoAt - 1);
         });
         form?.querySelectorAll('[data-star]').forEach((star) => star.addEventListener('click', () => pick(Number(star.dataset.star))));
-        [dialog, gallery, announceBox, memberBox].forEach((box) => {
+        [dialog, gallery, announceBox, memberBox, prayerBox].forEach((box) => {
             box?.querySelectorAll('[data-cmt-close]').forEach((close) => close.addEventListener('click', () => box.close()));
             box?.addEventListener('click', (event) => { if (event.target === box) box.close(); });
             box?.addEventListener('close', () => release());
