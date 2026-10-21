@@ -141,7 +141,7 @@ p { margin: 0; }
 .pastor-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 5; border-radius: var(--radius); background: linear-gradient(135deg, #fbbf24, var(--brand) 55%, #b45309); color: #fff; font-size: 3rem; font-weight: 800; }
 .dlg-text ul.bio-list li strong { color: var(--ink); }
 .pastor { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: center; gap: 2rem; max-width: 46rem; margin: 0 auto; padding: 1.25rem; border-radius: calc(var(--radius) + .5rem); background: var(--soft); border: 1px solid var(--line); }
-.pastor img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); }
+.pastor img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 20%; border-radius: var(--radius); } /* the face is usually near the top */
 .pastor-text span { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--brand-dark); }
 .pastor-text h3 { margin: .35rem 0 1.25rem; font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 800; }
 @media (max-width: 640px) { .pastor { grid-template-columns: 1fr; text-align: center; } .pastor img { max-width: 18rem; margin: 0 auto; } }
