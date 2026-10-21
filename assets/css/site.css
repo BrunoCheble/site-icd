@@ -133,6 +133,13 @@ p { margin: 0; }
 .schedule li.is-main { background: rgba(248, 169, 37, .12); border-color: rgba(248, 169, 37, .45); }
 
 /* Pastors */
+/* Several pastors: a card each (one alone keeps the large card) */
+.pastors.is-many { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 17rem)); justify-content: center; gap: 1.25rem; }
+.pastors.is-many .pastor { grid-template-columns: 1fr; align-items: start; align-content: start; gap: 1rem; padding: 1rem; text-align: center; max-width: none; margin: 0; }
+.pastors.is-many .pastor img, .pastors.is-many .pastor-photo { max-width: none; }
+.pastors.is-many .pastor-text h3 { font-size: 1.3rem; margin-bottom: .9rem; }
+.pastor-photo { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 5; border-radius: var(--radius); background: linear-gradient(135deg, #fbbf24, var(--brand) 55%, #b45309); color: #fff; font-size: 3rem; font-weight: 800; }
+.dlg-text ul.bio-list li strong { color: var(--ink); }
 .pastor { display: grid; grid-template-columns: minmax(0, 18rem) minmax(0, 1fr); align-items: center; gap: 2rem; max-width: 46rem; margin: 0 auto; padding: 1.25rem; border-radius: calc(var(--radius) + .5rem); background: var(--soft); border: 1px solid var(--line); }
 .pastor img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radius); }
 .pastor-text span { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--brand-dark); }

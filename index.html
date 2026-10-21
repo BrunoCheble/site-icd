@@ -83,7 +83,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610210903">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610211200">
 </head>
 
 <body>
@@ -505,12 +505,14 @@
     </section>
 
     <!-- Pastors -->
-    <section class="section" id="pastors">
+    <section class="section" id="pastors" data-api="https://admin.igrejaicd.pt/api/public/pastors">
         <div class="wrap">
             <div class="heading reveal">
                 <img src="assets/images/logo-224.png" width="224" height="224" loading="lazy" alt="Conheça nossos Pastores">
                 <h2>Conheça nossos <em>Pastores</em></h2>
             </div>
+            <!-- Replaced by the pastoral ministry's members from the system (see site.js); this one stays without it -->
+            <div class="pastors" id="pastors-list">
             <article class="pastor reveal">
                 <img src="assets/images/pastor-presidente.jpg" alt="Pastor Emerson Ernani Souza">
                 <div class="pastor-text">
@@ -519,6 +521,7 @@
                     <button type="button" class="btn btn-primary" data-open="pastorInfoModal">Biografia</button>
                 </div>
             </article>
+            </div>
         </div>
     </section>
 
@@ -710,6 +713,20 @@
         <footer class="dlg-foot"><button type="button" class="dlg-step" data-switch="youthModal"><i class="fas fa-arrow-left"></i> <span>Relevantes</span></button><button type="button" class="dlg-step is-next" data-switch="pastoralModal"><span>Pastoral</span> <i class="fas fa-arrow-right"></i></button><button type="button" class="btn btn-ghost dlg-close" data-close>Fechar</button></footer>
     </div>
 </dialog>
+<dialog class="dlg" id="pastorBioModal" aria-labelledby="pastorBioModal-title">
+    <div class="dlg-box">
+        <header class="dlg-head">
+            <div class="dlg-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="dlg-titles"><span>Pastores</span><h3 id="pastorBioModal-title"></h3></div>
+            <button type="button" class="dlg-x" data-close aria-label="Fechar"><i class="fas fa-times"></i></button>
+        </header>
+        <div class="dlg-main">
+            <nav class="dlg-toc" aria-label="Biografia"></nav>
+            <div class="dlg-body"></div>
+        </div>
+        <footer class="dlg-foot"><button type="button" class="btn btn-ghost dlg-close" data-close>Fechar</button></footer>
+    </div>
+</dialog>
 <dialog class="dlg" id="pastorInfoModal" aria-labelledby="pastorInfoModal-title">
     <div class="dlg-box">
         <header class="dlg-head">
@@ -725,7 +742,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610210931"></script>
+    <script src="assets/js/site.js?v=202610211200"></script>
 </body>
 
 </html>

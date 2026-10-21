@@ -716,6 +716,60 @@
     }
 
     // Cards and blocks appear as the page scrolls.
+    // The pastors, from the system's pastoral ministry (order, photo, role and an optional biography organised as
+    // each one wants: sections with an index, or simple). Without an answer, the card written in the page stays.
+    const pastorsSection = document.getElementById('pastors');
+    const pastorsList = document.getElementById('pastors-list');
+    if (pastorsSection?.dataset.api && pastorsList) {
+        const esc = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const link = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+        const initials = (name) => name.split(/\s+/).filter(Boolean).map((word, i, all) => (i === 0 || i === all.length - 1 ? word[0] : '')).join('').toUpperCase();
+        const blockHtml = (block) => {
+            if (block.type === 'text') return block.text.split(/\n{2,}/).map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
+            if (block.type === 'link') return `<p>${block.text ? esc(block.text) + ' ' : ''}${link(block.url, block.label)}</p>`;
+            if (block.type === 'list') return `<ul class="bio-list">${block.items.map((item) => {
+                const text = item.url ? link(item.url, item.text || item.url) : esc(item.text || '');
+                return `<li>${item.title ? `<strong>${esc(item.title)}</strong> ` : ''}${text}</li>`;
+            }).join('')}</ul>`;
+            return '';
+        };
+        let pastors = [];
+        const showBio = (index) => {
+            const pastor = pastors[index];
+            const dialog = document.getElementById('pastorBioModal');
+            if (!pastor?.bio || !dialog) return;
+            const withIndex = pastor.bio.layout !== 'simple';
+            dialog.querySelector('h3').textContent = `Biografia: ${pastor.name}`;
+            dialog.querySelector('.dlg-toc').innerHTML = withIndex
+                ? pastor.bio.sections.map((section, i) => section.title ? `<a href="#pastorBio-s${i}" data-goto="pastorBio-s${i}">${esc(section.title)}</a>` : '').join('')
+                : '';
+            dialog.querySelector('.dlg-body').innerHTML = pastor.bio.sections.map((section, i) =>
+                `<section class="dlg-part" id="pastorBio-s${i}">${section.title ? `<h4>${esc(section.title)}</h4>` : ''}<div class="dlg-text">${section.blocks.map(blockHtml).join('')}</div></section>`).join('');
+            open('pastorBioModal');
+        };
+        pastorsList.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-bio]');
+            if (button) showBio(Number(button.dataset.bio));
+        });
+        fetch(pastorsSection.dataset.api, { headers: { Accept: 'application/json' } })
+            .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+            .then(({ data }) => {
+                if (!Array.isArray(data) || !data.length) return;
+                pastors = data;
+                pastorsList.classList.toggle('is-many', data.length > 1);
+                pastorsList.innerHTML = data.map((pastor, i) => `
+                    <article class="pastor reveal is-visible">
+                        ${pastor.photo ? `<img src="${esc(pastor.photo)}" alt="${esc(pastor.name)}" loading="lazy">` : `<div class="pastor-photo" aria-hidden="true">${esc(initials(pastor.name))}</div>`}
+                        <div class="pastor-text">
+                            ${pastor.role ? `<span>${esc(pastor.role)}</span>` : ''}
+                            <h3>${esc(pastor.name)}</h3>
+                            ${pastor.bio ? `<button type="button" class="btn btn-primary" data-bio="${i}">Biografia</button>` : ''}
+                        </div>
+                    </article>`).join('');
+            })
+            .catch(() => {});
+    }
+
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); reveal.unobserve(entry.target); }
     }), { rootMargin: '0px 0px -8% 0px' });
