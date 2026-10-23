@@ -76,7 +76,13 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .hero-social a { display: inline-flex; align-items: center; gap: .45rem; color: #fff; font-size: .9rem; text-decoration: none; opacity: .92; text-shadow: 0 1px 8px rgba(0, 0, 0, .45); transition: opacity .15s, color .15s; }
 .hero-social a:hover { opacity: 1; color: #fde68a; }
 .hero-social i { font-size: 1.1rem; }
-@media (max-width: 640px) { .hero-social { gap: .5rem 1.1rem; padding-bottom: 3.25rem; } .hero-social a { font-size: .8rem; } }
+/* Phones: icons only, in one row (the names stay for screen readers) */
+@media (max-width: 640px) {
+    .hero-social { flex-wrap: nowrap; gap: .75rem; padding-bottom: 3.9rem; }
+    .hero-social a { justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .25); backdrop-filter: blur(4px); }
+    .hero-social a span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .hero-social i { font-size: 1.15rem; }
+}
 .hero-times { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 2rem; }
 .hero-times span { padding: .55rem 1rem; border-radius: 999px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .2); backdrop-filter: blur(6px); font-size: .9rem; }
 .hero-times i { color: var(--brand); margin-right: .25rem; }
