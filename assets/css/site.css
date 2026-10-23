@@ -146,6 +146,16 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .schedule li { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.25rem; border-radius: 1rem; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); }
 .schedule li i { flex: none; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .8rem; background: rgba(248, 169, 37, .15); color: var(--brand); }
 .schedule li strong { color: #fff; }
+.class-note { display: block; margin-top: .3rem; font-size: .82rem; opacity: .75; }
+.class-note[hidden], .class-join[hidden] { display: none; }
+.class-join { display: flex; width: fit-content; min-height: 40px; margin-top: .6rem; padding: .5rem 1rem; font-size: .9rem; }
+.schedule li .class-join i { width: auto; height: auto; background: none; color: inherit; border-radius: 0; }
+.class-choices { display: grid; gap: .6rem; }
+.class-choice { display: flex; align-items: center; gap: .85rem; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: .9rem; color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s; }
+.class-choice:hover { border-color: var(--brand); background: var(--brand-soft); }
+.class-choice i { flex: none; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; border-radius: .75rem; background: var(--brand-soft); color: var(--brand-dark); }
+.class-choice strong { display: block; font-size: 1rem; }
+.class-choice small { display: block; color: var(--muted); font-size: .82rem; }
 .schedule li.is-main { background: rgba(248, 169, 37, .12); border-color: rgba(248, 169, 37, .45); }
 
 /* Pastors */

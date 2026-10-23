@@ -776,6 +776,35 @@
             .catch(() => {});
     }
 
+    // The Bible school online (Mondays at 20:00, Lisbon time): from 10 minutes before (19:50) until 22:00 its line shows
+    // "Entrar na aula", which opens the choice of class (adults or Relevantes) in Google Meet.
+    const bibleClass = document.getElementById('bible-class');
+    const classDialog = document.getElementById('class-dialog');
+    if (bibleClass && classDialog) {
+        const OPEN_FROM = 19 * 60 + 50, OPEN_UNTIL = 22 * 60;
+        const lisbonNow = () => {
+            const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
+                .formatToParts(new Date()).map((part) => [part.type, part.value]));
+            return { day: parts.weekday, minutes: Number(parts.hour) * 60 + Number(parts.minute) };
+        };
+        const button = bibleClass.querySelector('.class-join');
+        const note = bibleClass.querySelector('.class-note');
+        const update = () => {
+            const { day, minutes } = lisbonNow();
+            const open = day === 'Mon' && minutes >= OPEN_FROM && minutes < OPEN_UNTIL;
+            button.hidden = !open;
+            note.hidden = open;
+        };
+        update();
+        setInterval(update, 30000);
+        button.addEventListener('click', () => classDialog.showModal());
+        classDialog.addEventListener('click', (event) => {
+            if (event.target === classDialog || event.target.closest('[data-class-close]')) classDialog.close();
+        });
+        // Choosing a class closes the window (the Meet opens in a new tab).
+        classDialog.querySelectorAll('.class-choice').forEach((link) => link.addEventListener('click', () => classDialog.close()));
+    }
+
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); reveal.unobserve(entry.target); }
     }), { rootMargin: '0px 0px -8% 0px' });
