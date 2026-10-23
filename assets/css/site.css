@@ -164,7 +164,7 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .class-choice small { display: block; color: var(--muted); font-size: .82rem; }
 .schedule li.is-main { background: rgba(248, 169, 37, .12); border-color: rgba(248, 169, 37, .45); }
 @media (max-width: 560px) {
-    .schedule li { align-items: flex-start; gap: .85rem; padding: 1rem; }
+    .schedule li { gap: .85rem; padding: 1rem; }
     .schedule li > i { width: 2.2rem; height: 2.2rem; border-radius: .7rem; font-size: .9rem; }
     .schedule-day { font-size: .7rem; }
     .schedule-time { font-size: .95rem; }
