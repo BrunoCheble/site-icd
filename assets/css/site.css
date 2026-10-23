@@ -148,9 +148,10 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .schedule li { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.25rem; border-radius: 1rem; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); }
 .schedule li i { flex: none; width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .8rem; background: rgba(248, 169, 37, .15); color: var(--brand); }
 .schedule-body { flex: 1; min-width: 0; }
-.schedule-day { display: block; font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .6); }
+.schedule-day { font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(255, 255, 255, .6); }
 .schedule li strong { display: block; margin-top: .15rem; color: #fff; font-size: 1.05rem; }
-.schedule-time { flex: none; align-self: flex-start; font-size: 1.15rem; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.schedule-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
+.schedule-time { flex: none; font-size: 1.05rem; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .class-note { display: block; margin-top: .3rem; font-size: .82rem; opacity: .75; }
 .class-note[hidden], .class-join[hidden] { display: none; }
 .class-join { display: flex; width: fit-content; min-height: 40px; margin-top: .6rem; padding: .5rem 1rem; font-size: .9rem; }
@@ -162,6 +163,16 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .class-choice strong { display: block; font-size: 1rem; }
 .class-choice small { display: block; color: var(--muted); font-size: .82rem; }
 .schedule li.is-main { background: rgba(248, 169, 37, .12); border-color: rgba(248, 169, 37, .45); }
+@media (max-width: 560px) {
+    .schedule li { align-items: flex-start; gap: .85rem; padding: 1rem; }
+    .schedule li > i { width: 2.2rem; height: 2.2rem; border-radius: .7rem; font-size: .9rem; }
+    .schedule-day { font-size: .7rem; }
+    .schedule-time { font-size: .95rem; }
+    .schedule li strong { font-size: 1rem; }
+}
+@media (max-width: 400px) {
+    .schedule li > i { display: none; }
+}
 
 /* Pastors */
 /* Several pastors: a card each (one alone keeps the large card) */
