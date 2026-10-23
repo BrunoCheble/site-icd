@@ -86,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610242100">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610250000">
 </head>
 
 <body>
@@ -97,6 +97,7 @@
             <nav class="nav-links" id="nav-links" aria-label="Secções">
                 <a href="#top" class="is-active">Home</a>
                 <a href="#about-us">Sobre Nós</a>
+                <a href="#gallery" hidden>Galeria</a>
                 <a href="#ministries">Ministérios</a>
                 <a href="#announcements">Anúncios</a>
                 <a href="#schedule">Horários</a>
@@ -198,6 +199,40 @@
             </div>
         </div>
     </section>
+
+    <!-- Gallery: the system's events (stories) and their photos (grid and viewer); hidden while there is none -->
+    <section class="section" id="gallery" data-api="https://admin.igrejaicd.pt/api/public/gallery" hidden>
+        <div class="wrap">
+            <div class="heading reveal">
+                <img src="assets/images/logo-224.png" width="224" height="224" loading="lazy" alt="Galeria">
+                <h2>Nossa <em>Galeria</em></h2>
+                <p>Momentos da nossa igreja: cultos, louvor, ensino e comunhão.</p>
+            </div>
+            <div class="gal-stories reveal" role="list" aria-label="Eventos"></div>
+            <div class="gal-grid"></div>
+            <div class="gal-more"><button type="button" class="btn btn-ghost" hidden><i class="fas fa-images"></i> Ver mais fotos</button></div>
+        </div>
+    </section>
+
+    <dialog class="story" id="gallery-story" aria-label="Eventos">
+        <div class="story-frame">
+            <img class="story-bg" alt="" aria-hidden="true">
+            <img class="story-img" alt="">
+            <div class="story-bars"></div>
+            <div class="story-head"><img class="story-avatar" alt=""><div><strong></strong><small></small></div>
+                <button type="button" class="story-x" aria-label="Fechar"><i class="fas fa-times"></i></button></div>
+            <p class="story-caption"></p>
+            <button type="button" class="story-tap story-back" aria-label="Foto anterior"></button>
+            <button type="button" class="story-tap story-fwd" aria-label="Foto seguinte"></button>
+        </div>
+    </dialog>
+
+    <dialog class="gal-view" id="gallery-view" aria-label="Foto">
+        <div class="gal-top"><span class="gal-count"></span><button type="button" class="gal-x" data-gal-close aria-label="Fechar"><i class="fas fa-times"></i></button></div>
+        <figure class="gal-stage"><img alt=""><figcaption></figcaption></figure>
+        <button type="button" class="gal-nav gal-prev" aria-label="Foto anterior"><i class="fas fa-chevron-left"></i></button>
+        <button type="button" class="gal-nav gal-next" aria-label="Foto seguinte"><i class="fas fa-chevron-right"></i></button>
+    </dialog>
 
     <!-- Ministries: a card each, "Saiba Mais" opens its page -->
     <section class="section section-soft" id="ministries">
@@ -780,7 +815,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610242200"></script>
+    <script src="assets/js/site.js?v=202610250000"></script>
 </body>
 
 </html>

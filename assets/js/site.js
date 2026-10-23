@@ -821,6 +821,167 @@
         classDialog.querySelectorAll('.class-choice').forEach((link) => link.addEventListener('click', () => classDialog.close()));
     }
 
+    // Gallery: the system's events as stories on top (their photos one after the other), the grid of photos below (the
+    // first ones, "Ver mais fotos" shows the rest) and the photo viewer (arrows, keyboard, swipe on phones). The section
+    // and its menu link show once the system answers with at least one event.
+    const gallery = document.getElementById('gallery');
+    const viewer = document.getElementById('gallery-view');
+    const story = document.getElementById('gallery-story');
+    const showGallery = (EVENTS) => {
+        const clean = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const PHOTOS = EVENTS.flatMap((event) => event.photos.map((item) => ({ ...item, album: event.name, date: event.date })));
+        const FIRST = 8;
+        const SEEN_KEY = 'icd-gallery-seen';
+        const STORY_MS = 5000;
+
+        // Stories: the most recent events
+        const STORIES = EVENTS.slice(0, 8);
+        const row = gallery.querySelector('.gal-stories');
+        const frame = story.querySelector('.story-frame');
+        const bars = story.querySelector('.story-bars');
+        let seen = [];
+        try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); } catch (e) { /* not kept */ }
+        const drawRow = () => {
+            row.innerHTML = STORIES.map((event, n) => `<button type="button" role="listitem" class="gal-story${seen.includes(event.id) ? ' is-seen' : ''}" data-event="${n}">`
+                + `<i><img src="${clean(event.cover)}" alt=""></i><span>${clean(event.name)}</span></button>`).join('');
+        };
+        let eventAt = 0;
+        let photoAt = 0;
+        let started = 0;
+        let elapsed = 0;
+        let paused = false;
+        let timer = null;
+        const markSeen = (event) => {
+            if (seen.includes(event.id)) return;
+            seen.push(event.id);
+            try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)); } catch (e) { /* not kept */ }
+        };
+        const showStory = () => {
+            const event = STORIES[eventAt];
+            const item = event.photos[photoAt];
+            markSeen(event);
+            story.querySelector('.story-img').src = item.src;
+            story.querySelector('.story-img').alt = item.caption;
+            story.querySelector('.story-bg').src = item.src;
+            story.querySelector('.story-avatar').src = event.cover;
+            story.querySelector('.story-head strong').textContent = event.name;
+            story.querySelector('.story-head small').textContent = event.date;
+            story.querySelector('.story-caption').textContent = item.caption;
+            bars.innerHTML = event.photos.map((_, n) => `<span class="${n < photoAt ? 'is-done' : ''}"><b></b></span>`).join('');
+            elapsed = 0;
+            started = performance.now();
+        };
+        const step = (by) => {
+            const event = STORIES[eventAt];
+            if (photoAt + by >= 0 && photoAt + by < event.photos.length) photoAt += by;
+            else if (by > 0 && eventAt < STORIES.length - 1) { eventAt += 1; photoAt = 0; }
+            else if (by < 0 && eventAt > 0) { eventAt -= 1; photoAt = STORIES[eventAt].photos.length - 1; }
+            else if (by > 0) { story.close(); return; }
+            showStory();
+        };
+        const tick = (now) => {
+            if (!story.open) return;
+            const done = paused ? elapsed : elapsed + (now - started);
+            const bar = bars.children[photoAt]?.querySelector('b');
+            if (bar) bar.style.width = Math.min(100, (done / STORY_MS) * 100) + '%';
+            if (done >= STORY_MS) step(1);
+            timer = requestAnimationFrame(tick);
+        };
+        const openStory = (n) => {
+            eventAt = n;
+            photoAt = 0;
+            paused = false;
+            showStory();
+            story.showModal();
+            cancelAnimationFrame(timer);
+            timer = requestAnimationFrame(tick);
+        };
+        row.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-event]');
+            if (button) openStory(Number(button.dataset.event));
+        });
+        story.querySelector('.story-fwd').addEventListener('click', () => step(1));
+        story.querySelector('.story-back').addEventListener('click', () => step(-1));
+        story.querySelector('.story-x').addEventListener('click', () => story.close());
+        story.addEventListener('click', (event) => { if (event.target === story) story.close(); });
+        story.addEventListener('close', () => { cancelAnimationFrame(timer); drawRow(); });
+        story.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') step(1);
+            if (event.key === 'ArrowLeft') step(-1);
+        });
+        // Holding the photo pauses it (a quick tap still goes on or back).
+        const pause = () => { if (!paused) { elapsed += performance.now() - started; paused = true; } };
+        const resume = () => { if (paused) { started = performance.now(); paused = false; } };
+        frame.addEventListener('pointerdown', pause);
+        ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => frame.addEventListener(type, resume));
+        drawRow();
+
+        // Grid and viewer
+        const grid = gallery.querySelector('.gal-grid');
+        const more = gallery.querySelector('.gal-more button');
+        const image = viewer.querySelector('.gal-stage img');
+        const caption = viewer.querySelector('figcaption');
+        const count = viewer.querySelector('.gal-count');
+        let at = 0;
+        const draw = (all = false) => {
+            const shown = all ? PHOTOS : PHOTOS.slice(0, FIRST);
+            grid.innerHTML = shown.map((item, n) => `<button type="button" class="gal-item" data-n="${n}">`
+                + `<img src="${clean(item.thumb)}" alt="${clean(item.caption)}" loading="lazy"><span>${clean(item.caption)}</span></button>`).join('');
+            more.hidden = shown.length === PHOTOS.length;
+        };
+        const show = (n) => {
+            at = (n + PHOTOS.length) % PHOTOS.length;
+            const item = PHOTOS[at];
+            image.src = item.src;
+            image.alt = item.caption;
+            caption.innerHTML = `${clean(item.caption)}<small>${clean(item.album)} · ${clean(item.date)}</small>`;
+            count.textContent = `${at + 1} / ${PHOTOS.length}`;
+        };
+        more.addEventListener('click', () => draw(true));
+        grid.addEventListener('click', (event) => {
+            const item = event.target.closest('.gal-item');
+            if (!item) return;
+            show(Number(item.dataset.n));
+            viewer.showModal();
+        });
+        viewer.querySelector('.gal-prev').addEventListener('click', () => show(at - 1));
+        viewer.querySelector('.gal-next').addEventListener('click', () => show(at + 1));
+        viewer.querySelector('[data-gal-close]').addEventListener('click', () => viewer.close());
+        viewer.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') show(at + 1);
+            if (event.key === 'ArrowLeft') show(at - 1);
+        });
+        let touchX = null;
+        viewer.addEventListener('touchstart', (event) => { touchX = event.touches[0].clientX; }, { passive: true });
+        viewer.addEventListener('touchend', (event) => {
+            if (touchX === null) return;
+            const moved = event.changedTouches[0].clientX - touchX;
+            touchX = null;
+            if (Math.abs(moved) > 50) show(at + (moved < 0 ? 1 : -1));
+        });
+        draw();
+    };
+    if (gallery?.dataset.api && viewer && story) {
+        // "Outubro 2026" from the event's date (Y-m-d).
+        const month = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' });
+        const label = (date) => month.format(new Date(date + 'T12:00:00')).replace(' de ', ' ').replace(/^./, (first) => first.toUpperCase());
+        fetch(gallery.dataset.api, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
+            .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+            .then(({ data }) => {
+                if (!data?.length) return;
+                showGallery(data.map((event) => ({
+                    id: event.id,
+                    name: event.name,
+                    date: label(event.date),
+                    cover: event.cover,
+                    photos: event.photos.map((item) => ({ src: item.src, thumb: item.thumb, caption: item.caption || event.name })),
+                })));
+                gallery.hidden = false;
+                document.querySelector('.nav-links a[href="#gallery"]')?.removeAttribute('hidden');
+            })
+            .catch(() => { /* no gallery: the section stays hidden */ });
+    }
+
     const reveal = new IntersectionObserver((entries) => entries.forEach((entry) => {
         if (entry.isIntersecting) { entry.target.classList.add('is-visible'); reveal.unobserve(entry.target); }
     }), { rootMargin: '0px 0px -8% 0px' });
