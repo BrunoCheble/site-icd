@@ -152,8 +152,7 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .schedule li strong { display: block; margin-top: .15rem; color: #fff; font-size: 1.05rem; }
 .schedule-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
 .schedule-time { flex: none; font-size: 1.05rem; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.class-note { display: block; margin-top: .3rem; font-size: .82rem; opacity: .75; }
-.class-note[hidden], .class-join[hidden] { display: none; }
+.class-join[hidden] { display: none; }
 .class-join { display: flex; width: fit-content; min-height: 40px; margin-top: .6rem; padding: .5rem 1rem; font-size: .9rem; }
 .schedule li .class-join i { width: auto; height: auto; background: none; color: inherit; border-radius: 0; }
 .class-choices { display: grid; gap: .6rem; }

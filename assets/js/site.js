@@ -788,12 +788,10 @@
             return { day: parts.weekday, minutes: Number(parts.hour) * 60 + Number(parts.minute) };
         };
         const button = bibleClass.querySelector('.class-join');
-        const note = bibleClass.querySelector('.class-note');
         const update = () => {
             const { day, minutes } = lisbonNow();
             const open = day === 'Mon' && minutes >= OPEN_FROM && minutes < OPEN_UNTIL;
             button.hidden = !open;
-            note.hidden = open;
         };
         update();
         setInterval(update, 30000);
