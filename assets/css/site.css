@@ -66,7 +66,7 @@ p { margin: 0; }
 body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 0; visibility: hidden; }
 .hero-content { position: relative; z-index: 1; align-self: center; padding: calc(var(--nav-h) + 1.5rem) 1.25rem 1.5rem; max-width: 52rem; }
 /* The year's theme, then the church's logo as the page's title (as on the 2026 banner) */
-.hero-theme { display: block; width: clamp(170px, 24vw, 300px); height: auto; margin: 0 auto clamp(1.5rem, 3.5vw, 2.5rem); filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .35)); }
+.hero-theme { display: block; width: clamp(170px, 24vw, 300px); height: auto; margin: clamp(.5rem, 2vw, 1.5rem) auto clamp(2.25rem, 5.5vw, 4rem); filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .35)); }
 .hero-title { margin: 0; line-height: 0; }
 .hero-title img { display: block; width: clamp(250px, 52vw, 640px); height: auto; margin: 0 auto; filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .35)); }
 @media (max-width: 640px) { .hero-title img { width: 78vw; } .hero-theme { width: 52vw; } }
