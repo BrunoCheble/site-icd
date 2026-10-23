@@ -596,6 +596,11 @@
                         else localStorage.removeItem(PRAYER_KEY);
                     } catch (e) { /* not kept */ }
                     done(prayerBox, answer);
+                    // Opened by its link: the thanks stays 3 seconds, then the site opens.
+                    if (prayerBox.classList.contains('is-direct')) {
+                        prayerBox.classList.add('is-sent');
+                        setTimeout(() => prayerBox.close(), 3000);
+                    }
                     return;
                 }
                 if (response.status === 422) showErrors(prayerBox, answer.errors)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -683,7 +688,7 @@
             prayerBox.classList.add('is-direct');
             openPrayer();
             prayerBox.addEventListener('close', () => {
-                prayerBox.classList.remove('is-direct');
+                prayerBox.classList.remove('is-direct', 'is-sent');
                 history.replaceState(null, '', location.pathname + location.search);
             }, { once: true });
         }
