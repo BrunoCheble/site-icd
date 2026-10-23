@@ -5,7 +5,13 @@
     const toggle = document.getElementById('nav-toggle');
 
     // The top bar turns white once the video is passed.
-    const solid = () => nav.classList.toggle('is-solid', window.scrollY > window.innerHeight * 0.6);
+    // Over the hero (the page's top): the bar is see-through, and its logo and the floating social links stay hidden
+    // (the hero shows them large).
+    const solid = () => {
+        const below = window.scrollY > window.innerHeight * 0.6;
+        nav.classList.toggle('is-solid', below);
+        document.body.classList.toggle('at-top', !below);
+    };
     solid();
     window.addEventListener('scroll', solid, { passive: true });
 

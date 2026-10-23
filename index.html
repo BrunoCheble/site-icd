@@ -51,7 +51,8 @@
         "sameAs": [
             "https://www.instagram.com/icdonline/",
             "https://www.facebook.com/icdcambra/",
-            "https://www.youtube.com/@icdonline"
+            "https://www.youtube.com/@icdonline",
+            "ICDCAST_URL"
         ],
         "event": [
             {
@@ -85,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610211500">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610232320">
 </head>
 
 <body>
@@ -106,15 +107,16 @@
         </div>
     </header>
 
-    <!-- Hero: the service video -->
+    <!-- Hero: the 2026 theme over the moving background (landscape on computers, portrait on phones) -->
     <section class="hero" id="top">
-        <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/images/bg.jpg">
-            <source src="assets/images/Encerrar Culto.mp4" type="video/mp4">
+        <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+            <source src="assets/videos/hero-mobile.mp4" type="video/mp4" media="(max-width: 760px) and (orientation: portrait)">
+            <source src="assets/videos/hero-desktop.mp4" type="video/mp4">
         </video>
         <div class="hero-shade"></div>
         <div class="hero-content">
-            <img class="hero-logo" src="assets/images/logo-224.png" alt="Igreja Cidade de David" width="224" height="224">
-            <h1>Igreja Cidade de David</h1>
+            <img class="hero-theme" src="assets/images/tema-2026.png" alt="Tema 2026: Evangelização, a chama não pode apagar" width="1000" height="239">
+            <h1 class="hero-title"><img src="assets/images/logo-icd.png" alt="Igreja Cidade de David" width="1200" height="253"></h1>
             <p class="hero-lead">Uma igreja que anuncia o Evangelho de Cristo.</p>
             <div class="hero-times">
                 <span><i class="far fa-clock"></i> <strong>Domingo:</strong> 10:30 – Culto da Família</span>
@@ -126,6 +128,14 @@
                 <button type="button" class="btn btn-light" data-form="prayer"><i class="fas fa-praying-hands"></i> Pedir oração</button>
             </div>
         </div>
+        <!-- The church's contacts and social networks, as on the 2026 banner -->
+        <nav class="hero-social" aria-label="Contactos e redes sociais">
+            <a href="https://api.whatsapp.com/send/?phone=351910108716&amp;text&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> +351 910 108 716</a>
+            <a href="https://www.instagram.com/icdonline/" target="_blank" rel="noopener"><i class="fab fa-instagram"></i> @icdonline</a>
+            <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i> @icdcambra</a>
+            <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener"><i class="fab fa-youtube"></i> @icdonline</a>
+            <a href="ICDCAST_URL" target="_blank" rel="noopener"><i class="fab fa-spotify"></i> icdcast</a>
+        </nav>
         <a href="#about-us" class="hero-down" aria-label="Sobre Nós"><i class="fas fa-chevron-down"></i></a>
     </section>
 
@@ -135,6 +145,7 @@
         <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
         <a href="https://api.whatsapp.com/send/?phone=351910108716&amp;text&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener" aria-label="Whatsapp" class="is-whatsapp"><i class="fab fa-whatsapp"></i></a>
         <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+        <a href="ICDCAST_URL" target="_blank" rel="noopener" aria-label="icdcast (podcast)" class="is-podcast"><i class="fab fa-spotify"></i></a>
     </div>
 
     <!-- About us -->
@@ -541,6 +552,7 @@
                     <li><i class="fab fa-instagram"></i><span><strong>Instagram:</strong> <a href="https://www.instagram.com/icdonline/" target="_blank" rel="noopener">icdonline</a></span></li>
                     <li><i class="fab fa-facebook-f"></i><span><strong>Facebook:</strong> <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener">icdcambra</a></span></li>
                     <li><i class="fab fa-youtube"></i><span><strong>Youtube:</strong> <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener">icdonline</a></span></li>
+                    <li><i class="fab fa-spotify"></i><span><strong>Podcast:</strong> <a href="ICDCAST_URL" target="_blank" rel="noopener">icdcast</a></span></li>
                 </ul>
                 <a href="https://maps.google.com/maps?q=Rua da Helipista 648, Vale de Cambra 3730-266&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=" target="_blank" rel="noopener" class="btn btn-primary"><i class="fas fa-directions"></i> Onde estamos</a>
             </div>
@@ -549,13 +561,14 @@
 
     <footer class="footer">
         <div class="wrap footer-inner">
-            <img src="assets/images/logo.png" alt="Igreja Cidade de David">
-            <p>&copy; 2024 Igreja Cidade de David | Todos os direitos reservados</p>
+            <img src="assets/images/logo-icd-480.png" alt="Igreja Cidade de David" width="480" height="101" loading="lazy">
+            <p>&copy; 2026 Igreja Cidade de David | Todos os direitos reservados</p>
             <div class="footer-social">
                 <a href="https://www.instagram.com/icdonline/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                 <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://api.whatsapp.com/send/?phone=351910108716&amp;text&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener" aria-label="Whatsapp"><i class="fab fa-whatsapp"></i></a>
                 <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                <a href="ICDCAST_URL" target="_blank" rel="noopener" aria-label="icdcast (podcast)"><i class="fab fa-spotify"></i></a>
             </div>
         </div>
     </footer>
@@ -744,7 +757,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610211650"></script>
+    <script src="assets/js/site.js?v=202610232310"></script>
 </body>
 
 </html>

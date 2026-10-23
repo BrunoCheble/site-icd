@@ -55,13 +55,28 @@ p { margin: 0; }
 }
 
 /* Hero: the service video under a dark veil */
-.hero { position: relative; min-height: 100svh; display: grid; place-items: center; overflow: hidden; color: #fff; text-align: center; }
-.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); filter: blur(7px) saturate(1.15) brightness(.85); }
-.hero-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(15, 23, 42, .45), rgba(15, 23, 42, .85)), linear-gradient(180deg, rgba(15, 23, 42, .6), rgba(15, 23, 42, .35) 40%, rgba(15, 23, 42, .9)); }
-.hero-content { position: relative; z-index: 1; padding: calc(var(--nav-h) + 2rem) 1.25rem 5rem; max-width: 52rem; }
-.hero-logo { width: 4.5rem; height: 4.5rem; margin: 0 auto 1.25rem; object-fit: contain; filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .35)); }
-.hero h1 { color: #fff; font-size: clamp(2.3rem, 6.2vw, 4.4rem); font-weight: 800; letter-spacing: -.03em; text-wrap: balance; }
-.hero-lead { margin-top: 1rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.15rem, 2.6vw, 1.6rem); opacity: .95; }
+.hero { position: relative; min-height: 100svh; display: grid; grid-template-rows: 1fr auto; justify-items: center; overflow: hidden; color: #fff; text-align: center;
+    /* The video's first frame while it loads */
+    background: #2a1206 url(../videos/hero-desktop.jpg) center / cover; }
+@media (max-width: 760px) and (orientation: portrait) { .hero { background-image: url(../videos/hero-mobile.jpg); } }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.05) brightness(.92); }
+.hero-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(20, 8, 2, .05), rgba(20, 8, 2, .45)), linear-gradient(180deg, rgba(20, 8, 2, .4), rgba(20, 8, 2, 0) 35%, rgba(20, 8, 2, .6)); }
+/* At the top of the page the hero shows the logo and the social links large: the bar's and the floating ones wait */
+.nav-logo, .social-float { transition: opacity .25s, visibility .25s; }
+body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 0; visibility: hidden; }
+.hero-content { position: relative; z-index: 1; align-self: center; padding: calc(var(--nav-h) + 1.5rem) 1.25rem 1.5rem; max-width: 52rem; }
+/* The year's theme, then the church's logo as the page's title (as on the 2026 banner) */
+.hero-theme { display: block; width: clamp(170px, 24vw, 300px); height: auto; margin: 0 auto clamp(1.5rem, 3.5vw, 2.5rem); filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .35)); }
+.hero-title { margin: 0; line-height: 0; }
+.hero-title img { display: block; width: clamp(250px, 52vw, 640px); height: auto; margin: 0 auto; filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .35)); }
+@media (max-width: 640px) { .hero-title img { width: 78vw; } .hero-theme { width: 52vw; } }
+.hero-lead { margin-top: 1.25rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.1rem, 2.4vw, 1.5rem); opacity: .95; text-shadow: 0 2px 12px rgba(0, 0, 0, .4); }
+/* Contacts and social networks at the foot of the video */
+.hero-social { position: relative; z-index: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem 1.75rem; padding: 1rem 1.25rem 3.75rem; }
+.hero-social a { display: inline-flex; align-items: center; gap: .45rem; color: #fff; font-size: .9rem; text-decoration: none; opacity: .92; text-shadow: 0 1px 8px rgba(0, 0, 0, .45); transition: opacity .15s, color .15s; }
+.hero-social a:hover { opacity: 1; color: #fde68a; }
+.hero-social i { font-size: 1.1rem; }
+@media (max-width: 640px) { .hero-social { gap: .5rem 1.1rem; padding-bottom: 3.25rem; } .hero-social a { font-size: .8rem; } }
 .hero-times { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 2rem; }
 .hero-times span { padding: .55rem 1rem; border-radius: 999px; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .2); backdrop-filter: blur(6px); font-size: .9rem; }
 .hero-times i { color: var(--brand); margin-right: .25rem; }
@@ -74,6 +89,7 @@ p { margin: 0; }
 .social-float a { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 999px; background: #fff; color: var(--ink); box-shadow: var(--shadow); text-decoration: none; transition: transform .15s; }
 .social-float a:hover { transform: scale(1.08); }
 .social-float a.is-whatsapp { background: #25d366; color: #fff; }
+.social-float a.is-podcast { background: #1db954; color: #fff; }
 @media (max-width: 640px) { .social-float a:not(.is-whatsapp) { display: none; } .social-float a.is-whatsapp { width: 56px; height: 56px; font-size: 1.5rem; } }
 
 /* Sections */
@@ -163,7 +179,7 @@ p { margin: 0; }
 /* Footer */
 .footer { padding: 2.5rem 0; background: var(--ink); color: #94a3b8; font-size: .9rem; }
 .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
-.footer-inner img { height: 2.4rem; width: auto; filter: brightness(0) invert(1); opacity: .9; }
+.footer-inner img { height: 2.4rem; width: auto; }
 .footer-social { display: flex; gap: .5rem; }
 .footer-social a { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 999px; background: rgba(255, 255, 255, .08); color: #fff; text-decoration: none; }
 .footer-social a:hover { background: var(--brand); }
