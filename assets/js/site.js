@@ -682,16 +682,19 @@
             box?.addEventListener('click', (event) => { if (event.target === box) box.close(); });
             box?.addEventListener('close', () => release());
         });
-        // The prayer form's own link (#pedir-oracao) opens it straight away; on phones it then shows the church's logo
-        // instead of the close button. Closing it leaves the link, so a reload shows the site.
-        if (prayerBox && location.hash === '#pedir-oracao') {
+        // The prayer form's own link (#pedir-oracao) opens it straight away, also when only the address's # changes;
+        // on phones it then shows the church's logo instead of the close button. Closing it leaves the link, so a reload shows the site.
+        const openPrayerLink = () => {
+            if (!prayerBox || location.hash !== '#pedir-oracao' || prayerBox.open) return;
             prayerBox.classList.add('is-direct');
             openPrayer();
             prayerBox.addEventListener('close', () => {
                 prayerBox.classList.remove('is-direct', 'is-sent');
                 history.replaceState(null, '', location.pathname + location.search);
             }, { once: true });
-        }
+        };
+        openPrayerLink();
+        window.addEventListener('hashchange', openPrayerLink);
         form?.addEventListener('submit', async (event) => {
             event.preventDefault();
             if (!current) return;
