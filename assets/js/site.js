@@ -776,12 +776,12 @@
             .catch(() => {});
     }
 
-    // The Bible school online (Mondays at 20:00, Lisbon time): from 10 minutes before (19:50) until 22:00 its line shows
+    // The Bible school online (Mondays at 20:00, Lisbon time): from 10 minutes before (19:50) until 21:00 its line shows
     // "Entrar na aula", which opens the choice of class (adults or Relevantes) in Google Meet.
     const bibleClass = document.getElementById('bible-class');
     const classDialog = document.getElementById('class-dialog');
     if (bibleClass && classDialog) {
-        const OPEN_FROM = 19 * 60 + 50, OPEN_UNTIL = 22 * 60;
+        const OPEN_FROM = 19 * 60 + 50, OPEN_UNTIL = 21 * 60;
         const lisbonNow = () => {
             const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
                 .formatToParts(new Date()).map((part) => [part.type, part.value]));
