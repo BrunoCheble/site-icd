@@ -153,7 +153,8 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .schedule-head { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; }
 .schedule-time { flex: none; font-size: 1.05rem; font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .class-join[hidden] { display: none; }
-.class-join { display: flex; width: fit-content; min-height: 40px; margin-top: .6rem; padding: .5rem 1rem; font-size: .9rem; }
+.schedule-row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.class-join { flex: none; min-height: 34px; margin-top: .25rem; padding: .3rem .9rem; font-size: .85rem; box-shadow: none; }
 .schedule li .class-join i { width: auto; height: auto; background: none; color: inherit; border-radius: 0; }
 .class-choices { display: grid; gap: .6rem; }
 .class-choice { display: flex; align-items: center; gap: .85rem; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: .9rem; color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s; }
