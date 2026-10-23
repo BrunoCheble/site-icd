@@ -596,10 +596,10 @@
                         else localStorage.removeItem(PRAYER_KEY);
                     } catch (e) { /* not kept */ }
                     done(prayerBox, answer);
-                    // Opened by its link: the thanks stays 3 seconds, then the site opens.
+                    // Opened by its link: the thanks stays 5 seconds, then the site opens.
                     if (prayerBox.classList.contains('is-direct')) {
                         prayerBox.classList.add('is-sent');
-                        setTimeout(() => prayerBox.close(), 3000);
+                        setTimeout(() => prayerBox.close(), 5000);
                     }
                     return;
                 }

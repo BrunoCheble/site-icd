@@ -461,12 +461,12 @@ body.has-dialog { overflow: hidden; }
 .form-done .done-note:empty { display: none; }
 .form-done .done-note { font-style: italic; }
 .form-done .cmt-actions { justify-content: center; margin-top: .5rem; }
-/* The prayer form opened by its link: once sent, only the thanks, then the site opens (3 s, see site.js) */
+/* The prayer form opened by its link: once sent, only the thanks, then the site opens (5 s, see site.js) */
 .done-leaving { display: none; }
 .form-dlg.is-sent .cmt-head, .form-dlg.is-sent .form-done .cmt-actions { display: none; }
 .form-dlg.is-sent .form-done { flex: 1 1 auto; align-content: center; }
 .form-dlg.is-sent .done-leaving { display: grid; gap: .5rem; justify-items: center; margin-top: 1rem; font-size: .85rem; }
-.done-leaving span { width: 8rem; height: 3px; border-radius: 3px; background: var(--brand); transform-origin: left; animation: leaving 3s linear forwards; }
+.done-leaving span { width: 8rem; height: 3px; border-radius: 3px; background: var(--brand); transform-origin: left; animation: leaving 5s linear forwards; }
 @keyframes leaving { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (max-width: 640px) {
     .form-dlg { width: 100%; max-width: none; height: 100%; height: 100dvh; max-height: none; margin: 0; border-radius: 0; }
