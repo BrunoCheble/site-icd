@@ -466,7 +466,11 @@ body.has-dialog { overflow: hidden; }
     .form-dlg[open] .cmt-box { height: 100%; max-height: none; padding: 1.1rem 1rem max(1rem, env(safe-area-inset-bottom)); }
     .form-row, .form-row.is-wide, .cat-fields { grid-template-columns: 1fr; }
     .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .form-dlg.is-direct .direct-brand { display: flex; justify-content: center; margin: -1.1rem -1rem 1rem; padding: 1.1rem 1rem; background: radial-gradient(ellipse at top, #1e293b, var(--ink)); }
+    .form-dlg.is-direct .direct-brand img { width: min(13rem, 60vw); height: auto; }
+    .form-dlg.is-direct .cmt-x, .form-dlg.is-direct form > .cmt-actions [data-cmt-close] { display: none; }
 }
+.direct-brand { display: none; }
 
 /* The prayer request: topics that start a line of the request, and "remember me" */
 .topics { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .2rem; }

@@ -86,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202610241700">
+    <link rel="stylesheet" href="assets/css/site.css?v=202610241900">
 </head>
 
 <body>
@@ -461,6 +461,8 @@
         <!-- A prayer request: anyone, no need to be a member; the church's team receives it -->
         <dialog class="cmt form-dlg" id="prayer-dialog" aria-labelledby="prayer-title">
             <form class="cmt-box" novalidate>
+                <!-- Shown on phones when the form is opened by its own link (#pedir-oracao), so it reads as the church's page -->
+                <a class="direct-brand" href="./"><img src="assets/images/logo-icd-480.png" width="480" height="101" alt="Igreja Cidade de David"></a>
                 <div class="cmt-head">
                     <div><h3 id="prayer-title">Pedir oração</h3><p class="cmt-about">"Não andem ansiosos por coisa alguma, mas em tudo, pela oração e súplicas, apresentem os vossos pedidos a Deus." — Filipenses 4:6</p></div>
                     <button type="button" class="cmt-x" data-cmt-close aria-label="Fechar"><i class="fas fa-times"></i></button>
@@ -777,7 +779,7 @@
     </div>
 </dialog>
 
-    <script src="assets/js/site.js?v=202610241800"></script>
+    <script src="assets/js/site.js?v=202610241900"></script>
 </body>
 
 </html>
