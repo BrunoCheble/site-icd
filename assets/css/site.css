@@ -59,8 +59,7 @@ p { margin: 0; }
     /* The video's first frame while it loads */
     background: #2a1206 url(../videos/hero-desktop.jpg) center / cover; }
 @media (max-width: 760px) and (orientation: portrait) { .hero { background-image: url(../videos/hero-mobile.jpg); } }
-.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.05) brightness(.92); }
-.hero-shade { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(20, 8, 2, .05), rgba(20, 8, 2, .45)), linear-gradient(180deg, rgba(20, 8, 2, .4), rgba(20, 8, 2, 0) 35%, rgba(20, 8, 2, .6)); }
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* At the top of the page the hero shows the logo and the social links large: the bar's and the floating ones wait */
 .nav-logo, .social-float { transition: opacity .25s, visibility .25s; }
 body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 0; visibility: hidden; }
