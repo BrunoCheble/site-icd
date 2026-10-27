@@ -234,21 +234,21 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .dlg-x { position: relative; z-index: 1; flex: none; width: 44px; height: 44px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .2); color: #fff; font-size: 1.05rem; cursor: pointer; transition: background .15s; }
 .dlg-x:hover { background: rgba(255, 255, 255, .32); }
 
-.dlg-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); }
+.dlg-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); }
+.dlg-main:has(.dlg-toc:not(:empty)) { grid-template-columns: 15.5rem minmax(0, 1fr); }
 .dlg-toc { overflow-y: auto; padding: 1.25rem .75rem; border-right: 1px solid var(--line); background: var(--soft); display: flex; flex-direction: column; gap: .2rem; }
 .dlg-toc:empty { display: none; }
 .dlg-toc a { position: relative; padding: .6rem .85rem; border-radius: .75rem; color: var(--muted); font-size: .86rem; font-weight: 600; line-height: 1.35; text-decoration: none; transition: background .15s, color .15s; }
 .dlg-toc a:hover { background: #fff; color: var(--ink); }
 .dlg-toc a.is-current { background: #fff; color: var(--brand-dark); box-shadow: 0 1px 3px rgba(15, 23, 42, .08); }
 .dlg-toc a.is-current::before { content: ''; position: absolute; left: 0; top: 25%; bottom: 25%; width: 3px; border-radius: 3px; background: var(--brand); }
-.dlg-main:has(.dlg-toc:empty) { grid-template-columns: minmax(0, 1fr); }
 
 .dlg-body { min-height: 0; overflow-y: auto; padding: 1.75rem clamp(1.25rem, 3vw, 2.5rem) 2.5rem; scroll-behavior: smooth; }
-.dlg-intro { max-width: 46rem; margin-bottom: 1.25rem; }
+.dlg-intro { max-width: 58rem; margin-bottom: 1.25rem; }
 .dlg-intro h4 { margin: .75rem 0 .35rem; font-size: 1.15rem; font-weight: 800; color: var(--ink); }
 .dlg-intro p { font-size: 1.05rem; line-height: 1.7; color: var(--text); text-align: left; }
 .dlg-intro hr { border: 0; border-top: 1px solid var(--line); margin: 1.5rem 0; }
-.dlg-part { max-width: 46rem; padding: 1.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.dlg-part { max-width: 58rem; padding: 1.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
 .dlg-part:first-of-type { border-top: 0; padding-top: .25rem; }
 .dlg-part h4 { display: flex; align-items: baseline; gap: .6rem; margin-bottom: .9rem; font-size: 1.2rem; font-weight: 800; color: var(--ink); }
 .dlg-part h4::before { content: ''; flex: none; width: .55rem; height: .55rem; border-radius: 50%; background: var(--brand); transform: translateY(-.15rem); }

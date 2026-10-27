@@ -589,7 +589,8 @@
             const value = (name) => pForm.elements[name].value;
             button.disabled = true;
             try {
-                const { response, answer } = await send(API + '/prayers', { name: value('name'), request: value('request'), phone_number: value('phone_number'), website: value('website'), device: deviceId() });
+                // ZZ-TEST (local only, not committed): no request to the backend, no limit.
+                const { response, answer } = { response: { ok: true, status: 201 }, answer: { title: 'Recebemos o seu pedido.', message: 'Vamos orar por si. Deus o abençoe!' } }; const zzUnused = () => send(API + '/prayers', { name: value('name'), request: value('request'), phone_number: value('phone_number'), website: value('website'), device: deviceId() });
                 if (response.ok) {
                     try {
                         if (pForm.elements.remember.checked) localStorage.setItem(PRAYER_KEY, JSON.stringify({ name: value('name'), phone: value('phone_number') }));
