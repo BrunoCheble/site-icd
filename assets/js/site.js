@@ -822,11 +822,52 @@
         classDialog.querySelectorAll('.class-choice').forEach((link) => link.addEventListener('click', () => classDialog.close()));
     }
 
-    // Gallery: the system's events as stories on top (their photos one after the other), the grid of photos below (the
-    // first ones, "Ver mais fotos" shows the rest) and the photo viewer (arrows, keyboard, swipe on phones). The section
-    // and its menu link show once the system answers with at least one event.
-    const gallery = document.getElementById('gallery');
+    // The photo viewer, shared by the gallery and the spaces: viewPhotos([{ src, caption, note }], n) opens it on the
+    // n-th photo; arrows, keyboard and swipe on phones go round the list (no arrows for a single photo).
     const viewer = document.getElementById('gallery-view');
+    let viewing = [];
+    let viewAt = 0;
+    const showViewing = (n) => {
+        viewAt = (n + viewing.length) % viewing.length;
+        const item = viewing[viewAt];
+        const image = viewer.querySelector('.gal-stage img');
+        const caption = viewer.querySelector('figcaption');
+        image.src = item.src;
+        image.alt = item.caption;
+        caption.textContent = item.caption;
+        if (item.note) caption.append(Object.assign(document.createElement('small'), { textContent: item.note }));
+        viewer.querySelector('.gal-count').textContent = viewing.length > 1 ? `${viewAt + 1} / ${viewing.length}` : '';
+    };
+    const viewPhotos = (photos, n = 0) => {
+        if (!viewer || !photos.length) return;
+        viewing = photos;
+        viewer.querySelectorAll('.gal-nav').forEach((arrow) => { arrow.hidden = photos.length < 2; });
+        showViewing(n);
+        if (!viewer.open) viewer.showModal();
+    };
+    if (viewer) {
+        viewer.querySelector('.gal-prev').addEventListener('click', () => showViewing(viewAt - 1));
+        viewer.querySelector('.gal-next').addEventListener('click', () => showViewing(viewAt + 1));
+        viewer.querySelector('[data-gal-close]').addEventListener('click', () => viewer.close());
+        viewer.addEventListener('keydown', (event) => {
+            if (viewing.length < 2) return;
+            if (event.key === 'ArrowRight') showViewing(viewAt + 1);
+            if (event.key === 'ArrowLeft') showViewing(viewAt - 1);
+        });
+        let touchX = null;
+        viewer.addEventListener('touchstart', (event) => { touchX = event.touches[0].clientX; }, { passive: true });
+        viewer.addEventListener('touchend', (event) => {
+            if (touchX === null) return;
+            const moved = event.changedTouches[0].clientX - touchX;
+            touchX = null;
+            if (Math.abs(moved) > 50 && viewing.length > 1) showViewing(viewAt + (moved < 0 ? 1 : -1));
+        });
+    }
+
+    // Gallery: the system's events as stories on top (their photos one after the other) and the grid of photos below
+    // (the first ones, "Ver mais fotos" shows the rest), opened in the photo viewer. The section and its menu link show
+    // once the system answers with at least one event.
+    const gallery = document.getElementById('gallery');
     const story = document.getElementById('gallery-story');
     const showGallery = (EVENTS) => {
         const clean = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -917,68 +958,45 @@
         ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => frame.addEventListener(type, resume));
         drawRow();
 
-        // Grid and viewer
+        // Grid (its photos open in the viewer)
         const grid = gallery.querySelector('.gal-grid');
         const more = gallery.querySelector('.gal-more button');
-        const image = viewer.querySelector('.gal-stage img');
-        const caption = viewer.querySelector('figcaption');
-        const count = viewer.querySelector('.gal-count');
-        let at = 0;
+        // Under the caption: its album (unless the caption is the album's name) and the date (the spaces have none).
+        const VIEW = PHOTOS.map((item) => ({ src: item.src, caption: item.caption, note: [item.caption === item.album ? '' : item.album, item.date].filter(Boolean).join(' · ') }));
         const draw = (all = false) => {
             const shown = all ? PHOTOS : PHOTOS.slice(0, FIRST);
             grid.innerHTML = shown.map((item, n) => `<button type="button" class="gal-item" data-n="${n}">`
                 + `<img src="${clean(item.thumb)}" alt="${clean(item.caption)}" loading="lazy"><span>${clean(item.caption)}</span></button>`).join('');
             more.hidden = shown.length === PHOTOS.length;
         };
-        const show = (n) => {
-            at = (n + PHOTOS.length) % PHOTOS.length;
-            const item = PHOTOS[at];
-            image.src = item.src;
-            image.alt = item.caption;
-            caption.innerHTML = `${clean(item.caption)}<small>${clean(item.album)} · ${clean(item.date)}</small>`;
-            count.textContent = `${at + 1} / ${PHOTOS.length}`;
-        };
         more.addEventListener('click', () => draw(true));
         grid.addEventListener('click', (event) => {
             const item = event.target.closest('.gal-item');
-            if (!item) return;
-            show(Number(item.dataset.n));
-            viewer.showModal();
-        });
-        viewer.querySelector('.gal-prev').addEventListener('click', () => show(at - 1));
-        viewer.querySelector('.gal-next').addEventListener('click', () => show(at + 1));
-        viewer.querySelector('[data-gal-close]').addEventListener('click', () => viewer.close());
-        viewer.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowRight') show(at + 1);
-            if (event.key === 'ArrowLeft') show(at - 1);
-        });
-        let touchX = null;
-        viewer.addEventListener('touchstart', (event) => { touchX = event.touches[0].clientX; }, { passive: true });
-        viewer.addEventListener('touchend', (event) => {
-            if (touchX === null) return;
-            const moved = event.changedTouches[0].clientX - touchX;
-            touchX = null;
-            if (Math.abs(moved) > 50) show(at + (moved < 0 ? 1 : -1));
+            if (item) viewPhotos(VIEW, Number(item.dataset.n));
         });
         draw();
     };
-    if (gallery?.dataset.api && viewer && story) {
-        // "Outubro 2026" from the event's date (Y-m-d).
+    // On localhost it asks the local system (data-api-local).
+    const galleryApi = (['localhost', '127.0.0.1'].includes(location.hostname) && gallery?.dataset.apiLocal) || gallery?.dataset.api;
+    if (galleryApi && viewer && story) {
+        // "Outubro 2026" from the event's date (Y-m-d); a space of the church has no date.
         const month = new Intl.DateTimeFormat('pt-PT', { month: 'long', year: 'numeric' });
         const label = (date) => month.format(new Date(date + 'T12:00:00')).replace(' de ', ' ').replace(/^./, (first) => first.toUpperCase());
-        fetch(gallery.dataset.api, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
+        fetch(galleryApi, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
             .then((response) => (response.ok ? response.json() : Promise.reject(response)))
             .then(({ data }) => {
                 if (!data?.length) return;
                 showGallery(data.map((event) => ({
                     id: event.id,
                     name: event.name,
-                    date: label(event.date),
+                    date: event.date ? label(event.date) : '',
                     cover: event.cover,
                     photos: event.photos.map((item) => ({ src: item.src, thumb: item.thumb, caption: item.caption || event.name })),
                 })));
                 gallery.hidden = false;
                 document.querySelector('.nav-links a[href="#gallery"]')?.removeAttribute('hidden');
+                // Opened by its link (…/#gallery): the section was hidden when the page loaded, so it goes there now.
+                if (location.hash === '#gallery') gallery.scrollIntoView();
             })
             .catch(() => { /* no gallery: the section stays hidden */ });
     }

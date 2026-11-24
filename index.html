@@ -203,12 +203,13 @@
         </div>
     </section>
 
-    <!-- Gallery: the system's events (stories) and their photos (grid and viewer); hidden while there is none -->
-    <section class="section" id="gallery" data-api="http://localhost:8092/zz-gallery.json" hidden>
+    <!-- Gallery: the system's albums, its events and the church's spaces (stories) and their photos (grid and viewer);
+         hidden while there is none. On localhost it asks the local system. -->
+    <section class="section" id="gallery" data-api="https://admin.igrejaicd.pt/api/public/gallery" data-api-local="http://localhost/api/public/gallery" hidden>
         <div class="wrap">
             <div class="heading reveal">
                 <img src="assets/images/logo-224.png" width="224" height="224" loading="lazy" alt="Galeria">
-                <h2>Nossa <em>Galeria</em></h2>
+                <h2>Nossos <em>Espaços</em></h2>
                 <p>Momentos da nossa igreja: cultos, louvor, ensino e comunhão.</p>
             </div>
             <div class="gal-stories reveal" role="list" aria-label="Eventos"></div>
@@ -1038,7 +1039,7 @@
         </div>
     </dialog>
 
-    <script src="assets/js/site.js?v=zzlocal"></script>
+    <script src="assets/js/site.js?v=202611240000"></script>
 </body>
 
 </html>
