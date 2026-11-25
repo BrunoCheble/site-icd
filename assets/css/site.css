@@ -90,6 +90,28 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .hero-down { position: absolute; z-index: 1; bottom: 1.5rem; left: 50%; translate: -50% 0; color: #fff; font-size: 1.2rem; opacity: .8; animation: bob 2s infinite; }
 @keyframes bob { 50% { transform: translateY(8px); } }
 
+/* Live now: a red pill under the menu while the YouTube channel is live (under the phone's open menu too) */
+.live-bar { position: fixed; z-index: 45; top: calc(var(--nav-h) + .5rem); left: 50%; translate: -50% 0; display: flex; align-items: center; max-width: calc(100% - 1.5rem); border-radius: 999px; background: #dc2626; color: #fff; box-shadow: 0 12px 30px rgba(220, 38, 38, .35); animation: live-in .4s cubic-bezier(.2, .8, .2, 1); }
+.live-bar[hidden] { display: none; }
+.live-link { display: flex; align-items: center; gap: .75rem; min-width: 0; padding: .55rem .5rem .55rem .6rem; color: inherit; text-decoration: none; }
+.live-badge { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .25rem .6rem; border-radius: 999px; background: rgba(255, 255, 255, .18); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.live-badge i { width: .5rem; height: .5rem; border-radius: 50%; background: #fff; animation: live-dot 1.4s ease-in-out infinite; }
+.live-title { min-width: 0; overflow: hidden; font-size: .92rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.live-go { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .8rem; border-radius: 999px; background: #fff; color: #dc2626; font-size: .85rem; font-weight: 800; }
+.live-link:hover .live-go i { transform: translateX(3px); }
+.live-go i { transition: transform .15s; }
+.live-x { flex: none; width: 2.25rem; height: 2.25rem; margin-right: .3rem; border: 0; border-radius: 50%; background: none; color: #fff; font-size: .9rem; cursor: pointer; opacity: .8; }
+.live-x:hover { background: rgba(255, 255, 255, .15); opacity: 1; }
+@keyframes live-dot { 50% { opacity: .25; } }
+@keyframes live-in { from { opacity: 0; transform: translateY(-.5rem); } }
+@media (max-width: 640px) {
+    .live-bar { width: calc(100% - 1.5rem); }
+    .live-link { flex: 1; gap: .55rem; }
+    .live-title { flex: 1; font-size: .85rem; }
+    .live-go { padding: .35rem .65rem; font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) { .live-bar, .live-badge i { animation: none; } }
+
 /* Social links on the side (at the bottom on phones) */
 .social-float { position: fixed; z-index: 40; right: 1rem; bottom: 1rem; display: flex; flex-direction: column; gap: .5rem; }
 .social-float a { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 999px; background: #fff; color: var(--ink); box-shadow: var(--shadow); text-decoration: none; transition: transform .15s; }

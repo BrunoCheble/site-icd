@@ -86,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202611250300">
+    <link rel="stylesheet" href="assets/css/site.css?v=202611250400">
 </head>
 
 <body>
@@ -107,6 +107,17 @@
             <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links"><span class="sr">Menu</span><i class="fas fa-bars"></i></button>
         </div>
     </header>
+
+    <!-- Live now: shown while the YouTube channel is live (site.js asks YouTube), links to the broadcast. The key is
+         the site's own (restricted to igrejaicd.pt and to the YouTube Data API), so it can be in the page. -->
+    <div class="live-bar" id="live-bar" data-channel="UC-H6a1DLO5DZJp8GtlYDyKA" data-key="AIzaSyDc-jIOTfgyH1uiuDZsrzn6F0WHciJGJGQ" hidden>
+        <a class="live-link" href="https://www.youtube.com/@icdonline/live" target="_blank" rel="noopener">
+            <span class="live-badge"><i></i>Ao vivo</span>
+            <span class="live-title">Estamos ao vivo no YouTube</span>
+            <span class="live-go">Assistir <i class="fas fa-arrow-right"></i></span>
+        </a>
+        <button type="button" class="live-x" aria-label="Fechar o aviso"><i class="fas fa-times"></i></button>
+    </div>
 
     <!-- Hero: the 2026 theme over the moving background (landscape on computers, portrait on phones) -->
     <section class="hero" id="top">
@@ -1051,7 +1062,7 @@
         </div>
     </dialog>
 
-    <script src="assets/js/site.js?v=202611240000"></script>
+    <script src="assets/js/site.js?v=202611250400"></script>
 </body>
 
 </html>

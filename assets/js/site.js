@@ -56,6 +56,46 @@
     document.querySelectorAll('[data-verse]').forEach((arrow) => arrow.addEventListener('click', () => show(current + Number(arrow.dataset.verse))));
     show(0);
 
+    // Live now: while the YouTube channel is live, a bar under the menu links to the broadcast. The channel's latest
+    // uploads (a broadcast is one of them) are checked on load, every 3 minutes while the page is in sight and when it
+    // comes back in sight (at most once a minute); a check costs 2 units of the key's free daily quota (10 000).
+    // Closing the bar hides it for that broadcast until the browser tab is closed.
+    const liveBar = document.getElementById('live-bar');
+    if (liveBar?.dataset.key && liveBar.dataset.channel) {
+        const { key, channel } = liveBar.dataset;
+        const api = 'https://www.googleapis.com/youtube/v3/';
+        const CLOSED_KEY = 'icd-live-closed';
+        const link = liveBar.querySelector('.live-link');
+        const title = liveBar.querySelector('.live-title');
+        const closed = () => { try { return sessionStorage.getItem(CLOSED_KEY); } catch (e) { return null; } };
+        let liveId = null;
+        let checked = 0;
+        const ask = (path) => fetch(`${api}${path}&key=${key}`).then((response) => (response.ok ? response.json() : Promise.reject(response)));
+        const check = async () => {
+            if (Date.now() - checked < 60000) return;
+            checked = Date.now();
+            try {
+                const uploads = await ask(`playlistItems?part=contentDetails&maxResults=5&playlistId=UU${channel.slice(2)}`);
+                const ids = (uploads.items || []).map((item) => item.contentDetails.videoId).join(',');
+                const videos = ids ? await ask(`videos?part=snippet&id=${ids}`) : { items: [] };
+                const live = (videos.items || []).find((video) => video.snippet.liveBroadcastContent === 'live');
+                liveId = live?.id || null;
+                if (live) {
+                    link.href = `https://www.youtube.com/watch?v=${live.id}`;
+                    title.textContent = live.snippet.title;
+                }
+                liveBar.hidden = !live || closed() === live.id;
+            } catch (e) { /* no answer: the bar stays as it was */ }
+        };
+        liveBar.querySelector('.live-x').addEventListener('click', () => {
+            liveBar.hidden = true;
+            try { sessionStorage.setItem(CLOSED_KEY, liveId || ''); } catch (e) { /* not kept */ }
+        });
+        check();
+        setInterval(() => { if (!document.hidden) check(); }, 180000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+    }
+
     // The ministries' pages and the biography; the phone's back button closes them.
     const open = (id, replace = false) => {
         const dialog = document.getElementById(id);
