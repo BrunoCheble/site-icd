@@ -86,7 +86,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/site.css?v=202611250000">
+    <link rel="stylesheet" href="assets/css/site.css?v=202611250100">
 </head>
 
 <body>
@@ -628,23 +628,35 @@
         </div>
     </section>
 
-    <!-- Where we are -->
+    <!-- Where we are: the map with the address card over it (under it on phones), the ways to come and to talk to us,
+         and the social networks -->
     <section class="section section-soft" id="contact-us">
-        <div class="wrap contact">
-            <div class="contact-map reveal">
-                <iframe title="Mapa" src="https://maps.google.com/maps?q=Rua da Helipista 648, Vale de Cambra 3730-266&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed" loading="lazy" allowfullscreen></iframe>
+        <div class="wrap">
+            <div class="heading reveal">
+                <img src="assets/images/logo-224.png" width="224" height="224" loading="lazy" alt="Onde estamos">
+                <h2>Onde <em>estamos</em></h2>
+                <p>Venha visitar-nos em Vale de Cambra: as nossas portas estão abertas para si.</p>
             </div>
-            <div class="contact-card reveal">
-                <h2 class="contact-title">Onde estamos</h2>
-                <ul class="contact-list">
-                    <li><i class="fas fa-map-marker-alt"></i><span><strong>Endereço:</strong> <a href="https://maps.google.com/maps?q=Rua da Helipista 648, Vale de Cambra 3730-266&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=" target="_blank" rel="noopener">Rua da Helipista 648, Vale de Cambra 3730-266</a></span></li>
-                    <li><i class="fab fa-whatsapp"></i><span><strong>Whatsapp:</strong> <a href="https://api.whatsapp.com/send/?phone=351910108716&amp;text&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener">Clique aqui para conversar!</a></span></li>
-                    <li><i class="fab fa-instagram"></i><span><strong>Instagram:</strong> <a href="https://www.instagram.com/icdonline/" target="_blank" rel="noopener">icdonline</a></span></li>
-                    <li><i class="fab fa-facebook-f"></i><span><strong>Facebook:</strong> <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener">icdcambra</a></span></li>
-                    <li><i class="fab fa-youtube"></i><span><strong>Youtube:</strong> <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener">icdonline</a></span></li>
-                    <li><i class="fab fa-spotify"></i><span><strong>Podcast:</strong> <a href="https://open.spotify.com/show/6B9JGmwgA16lfypoAZZGzn" target="_blank" rel="noopener">icdcast</a></span></li>
-                </ul>
-                <a href="https://maps.google.com/maps?q=Rua da Helipista 648, Vale de Cambra 3730-266&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=" target="_blank" rel="noopener" class="btn btn-primary"><i class="fas fa-directions"></i> Onde estamos</a>
+            <div class="contact reveal">
+                <div class="contact-map">
+                    <iframe title="Mapa: Igreja Cidade de David, Rua da Helipista 648, Vale de Cambra" src="https://maps.google.com/maps?q=Rua%20da%20Helipista%20648%2C%203730-266%20Vale%20de%20Cambra&amp;z=15&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+                </div>
+                <div class="contact-card">
+                    <span class="contact-pin"><i class="fas fa-map-marker-alt"></i></span>
+                    <span class="contact-tag">Igreja Cidade de David</span>
+                    <address class="contact-address">Rua da Helipista 648<br>3730-266 Vale de Cambra</address>
+                    <div class="contact-actions">
+                        <a class="btn btn-primary" href="https://www.google.com/maps/dir/?api=1&amp;destination=Rua%20da%20Helipista%20648%2C%203730-266%20Vale%20de%20Cambra" target="_blank" rel="noopener"><i class="fas fa-directions"></i> Como chegar</a>
+                        <a class="btn btn-ghost" href="https://api.whatsapp.com/send/?phone=351910108716&amp;text&amp;type=phone_number&amp;app_absent=0" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    </div>
+                    <div class="contact-social">
+                        <span>Siga-nos</span>
+                        <a href="https://www.instagram.com/icdonline/" target="_blank" rel="noopener" aria-label="Instagram: icdonline"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/icdcambra/" target="_blank" rel="noopener" aria-label="Facebook: icdcambra"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.youtube.com/@icdonline" target="_blank" rel="noopener" aria-label="YouTube: icdonline"><i class="fab fa-youtube"></i></a>
+                        <a href="https://open.spotify.com/show/6B9JGmwgA16lfypoAZZGzn" target="_blank" rel="noopener" aria-label="Podcast icdcast no Spotify"><i class="fab fa-spotify"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
