@@ -196,7 +196,7 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 
 /* Where we are */
 /* Where we are: the map fills the block and the address card floats over it (frosted glass); on phones the card goes
-   under the map, rising a little over its end */
+   under the map */
 .contact { position: relative; display: grid; align-items: center; min-height: 32rem; border-radius: calc(var(--radius) + .5rem); overflow: hidden; background: var(--line); box-shadow: var(--shadow); isolation: isolate; }
 .contact-map { position: absolute; inset: 0; }
 /* Google's own place box (top left of the map, the address again) is pushed out above the block: the map is taller
@@ -216,7 +216,8 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
     .contact { min-height: 0; overflow: visible; border-radius: 0; background: none; box-shadow: none; }
     .contact-map { position: relative; height: 18rem; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
     .contact-map iframe { top: -150px; height: calc(100% + 150px); }
-    .contact-card { width: auto; margin: -3.5rem .75rem 0; padding: 1.4rem; background: #fff; }
+    /* Under the map, not over it: the map's bottom row (Google's logo, terms and buttons) stays in sight */
+    .contact-card { width: auto; margin: .75rem 0 0; padding: 1.4rem; background: #fff; }
 }
 
 /* Footer */
