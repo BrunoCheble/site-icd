@@ -22,7 +22,13 @@
         nav.classList.toggle('is-solid', open || window.scrollY > window.innerHeight * 0.6);
     });
     links.addEventListener('click', (event) => {
-        if (event.target.closest('a')) { links.classList.remove('is-open'); toggle.setAttribute('aria-expanded', 'false'); solid(); }
+        const link = event.target.closest('a');
+        if (!link) return;
+        links.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        solid();
+        // Marked at once (the scroll then keeps the mark on the section on screen).
+        links.querySelectorAll('a').forEach((a) => a.classList.toggle('is-active', a === link));
     });
 
     // The section on screen, marked in the menu.

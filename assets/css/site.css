@@ -46,6 +46,8 @@ p { margin: 0; }
 .nav-links a:hover { background: rgba(255, 255, 255, .15); }
 .nav.is-solid .nav-links a:hover { background: var(--soft); }
 .nav-links a.is-active { color: var(--brand); }
+/* On the white bar (and the phone's open menu) the link colour above would win: the section on screen keeps its mark */
+.nav.is-solid .nav-links a.is-active { color: var(--brand-dark); background: var(--brand-soft); }
 .nav-toggle { display: none; margin-left: auto; width: 44px; height: 44px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .15); color: #fff; font-size: 1.1rem; cursor: pointer; }
 .nav.is-solid .nav-toggle { background: var(--soft); color: var(--ink); }
 @media (max-width: 900px) {
