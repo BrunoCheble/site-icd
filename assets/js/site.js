@@ -786,36 +786,115 @@
         near.observe(ads);
     }
 
+    // A text in sections from the system (its MinistryBio): a pastor's biography, a ministry's page. Texts are escaped;
+    // **…** shows in bold and a blank line starts a paragraph. Lists can be numbered and have sub-items; a table's first
+    // row can be its header.
+    const esc = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const rich = (text) => esc(text).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const linkHtml = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
+    const blockHtml = (block, listClass = '') => {
+        if (block.type === 'text') return block.text.split(/\n{2,}/).map((p) => `<p>${rich(p).replace(/\n/g, '<br>')}</p>`).join('');
+        if (block.type === 'link') return `<p>${block.text ? rich(block.text) + ' ' : ''}${linkHtml(block.url, block.label)}</p>`;
+        if (block.type === 'list') {
+            const tag = block.ordered ? 'ol' : 'ul';
+            return `<${tag}${listClass ? ` class="${listClass}"` : ''}>${block.items.map((item) => {
+                const text = item.url ? linkHtml(item.url, item.text || item.url) : rich(item.text || '');
+                const sub = item.sub?.length ? `<ul>${item.sub.map((line) => `<li>${rich(line)}</li>`).join('')}</ul>` : '';
+                return `<li>${item.title ? `<strong>${rich(item.title)}</strong> ` : ''}${text}${sub}</li>`;
+            }).join('')}</${tag}>`;
+        }
+        if (block.type === 'table') {
+            const row = (cells, cell) => `<tr>${cells.map((text) => `<${cell}>${rich(text)}</${cell}>`).join('')}</tr>`;
+            const [first, ...rest] = block.rows;
+            return `<div class="dlg-table"><table>${block.head
+                ? `<thead>${row(first, 'th')}</thead><tbody>${rest.map((r) => row(r, 'td')).join('')}</tbody>`
+                : `<tbody>${block.rows.map((r) => row(r, 'td')).join('')}</tbody>`}</table></div>`;
+        }
+        return '';
+    };
+    // Fills a window's index and body (section ids <prefix>-s<n>; the index only with the "sections" layout). A section
+    // without a title is an opening text (out of the index) when `intros`, otherwise a part without a heading.
+    const fillText = (dialog, text, prefix, { listClass = '', intros = false } = {}) => {
+        dialog.querySelector('.dlg-toc').innerHTML = text.layout !== 'simple'
+            ? text.sections.map((section, i) => (section.title ? `<a href="#${prefix}-s${i}" data-goto="${prefix}-s${i}">${esc(section.title)}</a>` : '')).join('')
+            : '';
+        dialog.querySelector('.dlg-body').innerHTML = text.sections.map((section, i) => {
+            const blocks = section.blocks.map((block) => blockHtml(block, listClass)).join('');
+            if (!section.title && intros) return `<div class="dlg-intro dlg-text">${blocks}</div>`;
+            return `<section class="dlg-part" id="${prefix}-s${i}">${section.title ? `<h4>${esc(section.title)}</h4>` : ''}<div class="dlg-text">${blocks}</div></section>`;
+        }).join('');
+    };
+
+    // The ministries, from the system (each one's "Página no site"): a card each, whose "Saiba Mais" opens its page in
+    // one window; "previous" and "next" there go round the ministries of its group. Shown once the system answers; on
+    // localhost it asks the local system.
+    const ministriesSection = document.getElementById('ministries');
+    const ministriesList = document.getElementById('ministries-list');
+    const ministryDialog = document.getElementById('ministryModal');
+    const ministriesApi = (['localhost', '127.0.0.1'].includes(location.hostname) && ministriesSection?.dataset.apiLocal) || ministriesSection?.dataset.api;
+    if (ministriesApi && ministriesList && ministryDialog) {
+        let ministries = [];
+        const close = '<button type="button" class="btn btn-ghost dlg-close" data-close>Fechar</button>';
+        const showMinistry = (n, replace = false) => {
+            const ministry = ministries[n];
+            if (!ministry?.page) return;
+            ministryDialog.querySelector('.dlg-icon i').className = `fas fa-${ministry.icon}`;
+            ministryDialog.querySelector('.dlg-titles span').textContent = ministry.group_label;
+            ministryDialog.querySelector('h3').textContent = ministry.page_title;
+            ministryDialog.querySelector('.dlg-toc').setAttribute('aria-label', ministry.page_title);
+            fillText(ministryDialog, ministry.page, `ministry${ministry.id}`, { intros: true });
+            const group = ministries.map((other, i) => ({ other, i })).filter(({ other }) => other.group === ministry.group && other.page);
+            const at = group.findIndex(({ i }) => i === n);
+            const [prev, next] = [group[(at - 1 + group.length) % group.length], group[(at + 1) % group.length]];
+            ministryDialog.querySelector('.dlg-foot').innerHTML = group.length > 1
+                ? `<button type="button" class="dlg-step" data-ministry="${prev.i}"><i class="fas fa-arrow-left"></i> <span>${esc(prev.other.tag)}</span></button>`
+                    + `<button type="button" class="dlg-step is-next" data-ministry="${next.i}"><span>${esc(next.other.tag)}</span> <i class="fas fa-arrow-right"></i></button>${close}`
+                : close;
+            open('ministryModal', replace);
+        };
+        ministriesList.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-ministry]');
+            if (button) showMinistry(Number(button.dataset.ministry));
+        });
+        ministryDialog.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-ministry]');
+            if (button) showMinistry(Number(button.dataset.ministry), true);
+        });
+        fetch(ministriesApi, { headers: { Accept: 'application/json' }, cache: 'no-cache' })
+            .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+            .then(({ data }) => {
+                if (!Array.isArray(data) || !data.length) return;
+                ministries = data;
+                ministriesList.innerHTML = data.map((ministry, i) => `
+                    <article class="ministry reveal is-visible">
+                        <div class="ministry-icon"><i class="fas fa-${esc(ministry.icon)}"></i></div>
+                        <span class="ministry-tag">${esc(ministry.tag)}</span>
+                        <h3>${esc(ministry.title)}</h3>
+                        ${ministry.summary ? `<p>${rich(ministry.summary)}</p>` : ''}
+                        ${ministry.page ? `<button type="button" class="ministry-more" data-ministry="${i}">Saiba Mais <i class="fas fa-arrow-right"></i></button>` : ''}
+                    </article>`).join('');
+                ministriesSection.hidden = false;
+                document.querySelector('.nav-links a[href="#ministries"]')?.removeAttribute('hidden');
+                // Opened by its link (…/#ministries): the section was hidden when the page loaded, so it goes there now.
+                if (location.hash === '#ministries') ministriesSection.scrollIntoView();
+            })
+            .catch(() => { /* no answer: the section stays hidden */ });
+    }
+
     // Cards and blocks appear as the page scrolls.
     // The pastors, from the system's pastoral ministry (order, photo, role and an optional biography organised as
     // each one wants: sections with an index, or simple). Without an answer, the card written in the page stays.
     const pastorsSection = document.getElementById('pastors');
     const pastorsList = document.getElementById('pastors-list');
     if (pastorsSection?.dataset.api && pastorsList) {
-        const esc = (text) => String(text ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        const link = (url, label) => `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
         const initials = (name) => name.split(/\s+/).filter(Boolean).map((word, i, all) => (i === 0 || i === all.length - 1 ? word[0] : '')).join('').toUpperCase();
-        const blockHtml = (block) => {
-            if (block.type === 'text') return block.text.split(/\n{2,}/).map((p) => `<p>${esc(p).replace(/\n/g, '<br>')}</p>`).join('');
-            if (block.type === 'link') return `<p>${block.text ? esc(block.text) + ' ' : ''}${link(block.url, block.label)}</p>`;
-            if (block.type === 'list') return `<ul class="bio-list">${block.items.map((item) => {
-                const text = item.url ? link(item.url, item.text || item.url) : esc(item.text || '');
-                return `<li>${item.title ? `<strong>${esc(item.title)}</strong> ` : ''}${text}</li>`;
-            }).join('')}</ul>`;
-            return '';
-        };
         let pastors = [];
         const showBio = (index) => {
             const pastor = pastors[index];
             const dialog = document.getElementById('pastorBioModal');
             if (!pastor?.bio || !dialog) return;
-            const withIndex = pastor.bio.layout !== 'simple';
             dialog.querySelector('h3').textContent = `Biografia: ${pastor.name}`;
-            dialog.querySelector('.dlg-toc').innerHTML = withIndex
-                ? pastor.bio.sections.map((section, i) => section.title ? `<a href="#pastorBio-s${i}" data-goto="pastorBio-s${i}">${esc(section.title)}</a>` : '').join('')
-                : '';
-            dialog.querySelector('.dlg-body').innerHTML = pastor.bio.sections.map((section, i) =>
-                `<section class="dlg-part" id="pastorBio-s${i}">${section.title ? `<h4>${esc(section.title)}</h4>` : ''}<div class="dlg-text">${section.blocks.map(blockHtml).join('')}</div></section>`).join('');
+            fillText(dialog, pastor.bio, 'pastorBio', { listClass: 'bio-list' });
             open('pastorBioModal');
         };
         pastorsList.addEventListener('click', (event) => {
