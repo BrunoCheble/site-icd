@@ -90,27 +90,30 @@ body.at-top .nav:not(.is-solid) .nav-logo, body.at-top .social-float { opacity: 
 .hero-down { position: absolute; z-index: 1; bottom: 1.5rem; left: 50%; translate: -50% 0; color: #fff; font-size: 1.2rem; opacity: .8; animation: bob 2s infinite; }
 @keyframes bob { 50% { transform: translateY(8px); } }
 
-/* Live now: a red pill under the menu while the YouTube channel is live (under the phone's open menu too) */
-.live-bar { position: fixed; z-index: 45; top: calc(var(--nav-h) + .5rem); left: 50%; translate: -50% 0; display: flex; align-items: center; max-width: calc(100% - 1.5rem); border-radius: 999px; background: #dc2626; color: #fff; box-shadow: 0 12px 30px rgba(220, 38, 38, .35); animation: live-in .4s cubic-bezier(.2, .8, .2, 1); }
+/* Live now: a dark glass pill under the menu while the YouTube channel is live (under the phone's open menu too), in
+   the site's colours: the brand's orange for the live dot and the "Assistir" button */
+.live-bar { position: fixed; z-index: 45; top: calc(var(--nav-h) + .5rem); left: 50%; translate: -50% 0; display: flex; align-items: center; max-width: calc(100% - 1.5rem); border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px; background: rgba(15, 23, 42, .82); -webkit-backdrop-filter: blur(12px) saturate(1.3); backdrop-filter: blur(12px) saturate(1.3); color: #fff; box-shadow: 0 14px 36px rgba(15, 23, 42, .3); animation: live-in .4s cubic-bezier(.2, .8, .2, 1); }
 .live-bar[hidden] { display: none; }
-.live-link { display: flex; align-items: center; gap: .75rem; min-width: 0; padding: .55rem .5rem .55rem .6rem; color: inherit; text-decoration: none; }
-.live-badge { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .25rem .6rem; border-radius: 999px; background: rgba(255, 255, 255, .18); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.live-badge i { width: .5rem; height: .5rem; border-radius: 50%; background: #fff; animation: live-dot 1.4s ease-in-out infinite; }
+.live-link { display: flex; align-items: center; gap: .75rem; min-width: 0; padding: .45rem .45rem .45rem .55rem; color: inherit; text-decoration: none; }
+.live-badge { flex: none; display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .7rem; border-radius: 999px; background: rgba(248, 169, 37, .16); color: var(--brand); font-size: .7rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.live-badge i { position: relative; width: .5rem; height: .5rem; border-radius: 50%; background: var(--brand); }
+.live-badge i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--brand); animation: live-ping 1.6s ease-out infinite; }
 .live-title { min-width: 0; overflow: hidden; font-size: .92rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-.live-go { flex: none; display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .8rem; border-radius: 999px; background: #fff; color: #dc2626; font-size: .85rem; font-weight: 800; }
-.live-link:hover .live-go i { transform: translateX(3px); }
+.live-go { flex: none; display: inline-flex; align-items: center; gap: .45rem; padding: .45rem 1rem; border-radius: 999px; background: var(--brand); color: #fff; font-size: .85rem; font-weight: 800; box-shadow: 0 6px 16px rgba(248, 169, 37, .35); transition: background .15s; }
+.live-link:hover .live-go { background: var(--brand-dark); }
 .live-go i { transition: transform .15s; }
-.live-x { flex: none; width: 2.25rem; height: 2.25rem; margin-right: .3rem; border: 0; border-radius: 50%; background: none; color: #fff; font-size: .9rem; cursor: pointer; opacity: .8; }
-.live-x:hover { background: rgba(255, 255, 255, .15); opacity: 1; }
-@keyframes live-dot { 50% { opacity: .25; } }
+.live-link:hover .live-go i { transform: translateX(3px); }
+.live-x { flex: none; width: 2.25rem; height: 2.25rem; margin-right: .3rem; border: 0; border-radius: 50%; background: none; color: #cbd5e1; font-size: .9rem; cursor: pointer; }
+.live-x:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+@keyframes live-ping { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.6); opacity: 0; } }
 @keyframes live-in { from { opacity: 0; transform: translateY(-.5rem); } }
 @media (max-width: 640px) {
     .live-bar { width: calc(100% - 1.5rem); }
     .live-link { flex: 1; gap: .55rem; }
     .live-title { flex: 1; font-size: .85rem; }
-    .live-go { padding: .35rem .65rem; font-size: .8rem; }
+    .live-go { padding: .4rem .75rem; font-size: .8rem; }
 }
-@media (prefers-reduced-motion: reduce) { .live-bar, .live-badge i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .live-bar, .live-badge i::after { animation: none; } }
 
 /* Social links on the side (at the bottom on phones) */
 .social-float { position: fixed; z-index: 40; right: 1rem; bottom: 1rem; display: flex; flex-direction: column; gap: .5rem; }
