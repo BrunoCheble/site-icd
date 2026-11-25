@@ -108,17 +108,6 @@
         </div>
     </header>
 
-    <!-- Live now: shown while the YouTube channel is live (site.js asks YouTube), links to the broadcast. The key is
-         the site's own (restricted to igrejaicd.pt and to the YouTube Data API), so it can be in the page. -->
-    <div class="live-bar" id="live-bar" data-channel="UC-H6a1DLO5DZJp8GtlYDyKA" data-key="AIzaSyDc-jIOTfgyH1uiuDZsrzn6F0WHciJGJGQ" hidden>
-        <a class="live-link" href="https://www.youtube.com/@icdonline/live" target="_blank" rel="noopener">
-            <span class="live-badge"><i></i>Ao vivo</span>
-            <span class="live-title">Estamos ao vivo no YouTube</span>
-            <span class="live-go">Assistir <i class="fas fa-arrow-right"></i></span>
-        </a>
-        <button type="button" class="live-x" aria-label="Fechar o aviso"><i class="fas fa-times"></i></button>
-    </div>
-
     <!-- Hero: the 2026 theme over the moving background (landscape on computers, portrait on phones) -->
     <section class="hero" id="top">
         <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
@@ -136,6 +125,17 @@
                 <a href="#schedule" class="btn btn-primary">Horários</a>
                 <a href="#contact-us" class="btn btn-light">Onde estamos</a>
                 <button type="button" class="btn btn-light" data-form="prayer"><i class="fas fa-praying-hands"></i> Pedir oração</button>
+            </div>
+            <!-- Live now, under the buttons: shown while the YouTube channel is live (site.js asks YouTube), links to the
+                 broadcast. The key is the site's own (restricted to igrejaicd.pt and to the YouTube Data API), so it can
+                 be in the page. -->
+            <div class="live-bar" id="live-bar" data-channel="UC-H6a1DLO5DZJp8GtlYDyKA" data-key="AIzaSyDc-jIOTfgyH1uiuDZsrzn6F0WHciJGJGQ" hidden>
+                <a class="live-link" href="https://www.youtube.com/@icdonline/live" target="_blank" rel="noopener">
+                    <span class="live-badge"><i></i>Ao vivo</span>
+                    <span class="live-title">Estamos ao vivo no YouTube</span>
+                    <span class="live-go">Assistir <i class="fas fa-arrow-right"></i></span>
+                </a>
+                <button type="button" class="live-x" aria-label="Fechar o aviso"><i class="fas fa-times"></i></button>
             </div>
         </div>
         <!-- The church's contacts and social networks, as on the 2026 banner -->

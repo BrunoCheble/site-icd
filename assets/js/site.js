@@ -56,7 +56,7 @@
     document.querySelectorAll('[data-verse]').forEach((arrow) => arrow.addEventListener('click', () => show(current + Number(arrow.dataset.verse))));
     show(0);
 
-    // Live now: while the YouTube channel is live, a bar under the menu links to the broadcast. The channel's latest
+    // Live now: while the YouTube channel is live, a pill under the hero's buttons links to the broadcast. The channel's latest
     // uploads (a broadcast is one of them) are checked on load, every 3 minutes while the page is in sight and when it
     // comes back in sight (at most once a minute); a check costs 2 units of the key's free daily quota (10 000).
     // Closing the bar hides it for that broadcast until the browser tab is closed.
